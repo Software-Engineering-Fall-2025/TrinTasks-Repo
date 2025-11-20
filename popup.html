@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>iCal Parser</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>iCal Parser</h1>
+    
+    <div class="input-section">
+      <label for="icalLink">Enter iCal Link:</label>
+      <input 
+        type="text" 
+        id="icalLink" 
+        placeholder="webcal://... or https://example.com/calendar.ics"
+        required
+      >
+      <button id="parseBtn">Parse iCal</button>
+    </div>
+
+    <div id="loadingSpinner" class="spinner hidden"></div>
+
+    <div id="errorMessage" class="error hidden"></div>
+
+    <div id="eventsList" class="events-list hidden">
+      <h2>Events</h2>
+      <div id="eventsContainer"></div>
+    </div>
+
+    <div id="noData" class="no-data">
+      Enter an iCal link and click "Parse iCal" to see events
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

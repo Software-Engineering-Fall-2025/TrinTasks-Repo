@@ -1,0 +1,14 @@
+{
+  "name": "iCal Parser",
+  "description": "Parse and display information from iCal links",
+  "version": "1.0",
+  "manifest_version": 3,
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "iCal Parser"
+  }
+}

@@ -9,11 +9,14 @@
   <div class="container">
     <div class="header">
       <h1>TrinTasks <span id="eventCount" style="font-size: 14px; color: #6b7280;"></span></h1>
-      <div id="viewToggle" class="view-toggle hidden">
-        <button id="toggleBtn" class="toggle-btn">
-          <span id="toggleIcon">📋</span>
-          <span id="toggleText">List View</span>
-        </button>
+      <div class="header-buttons">
+        <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+        <div id="viewToggle" class="view-toggle hidden">
+          <button id="toggleBtn" class="toggle-btn">
+            <span id="toggleIcon">📋</span>
+            <span id="toggleText">List View</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -61,6 +64,47 @@
 
     <div id="noData" class="no-data">
       Enter an iCal link and click "Parse iCal" to see events
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel hidden">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button id="closeSettings" class="close-btn">×</button>
+      </div>
+      <div class="settings-content">
+        <div class="settings-group">
+          <label for="settingsIcalLink">iCal Link:</label>
+          <input
+            type="text"
+            id="settingsIcalLink"
+            placeholder="webcal://... or https://example.com/calendar.ics"
+          >
+          <p class="settings-hint">Update your calendar source here. Changes will be saved automatically.</p>
+        </div>
+
+        <div class="settings-group">
+          <label>Saved Calendars:</label>
+          <div id="savedCalendars" class="saved-calendars"></div>
+        </div>
+
+        <div class="settings-group">
+          <button id="addCalendarBtn" class="btn-primary">Add New Calendar</button>
+          <button id="clearDataBtn" class="btn-danger">Clear All Data</button>
+        </div>
+
+        <div class="settings-group">
+          <label>
+            <input type="checkbox" id="autoRefresh">
+            Auto-refresh calendar every hour
+          </label>
+        </div>
+
+        <div class="settings-footer">
+          <button id="saveSettings" class="btn-primary">Save Settings</button>
+          <button id="cancelSettings" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
 

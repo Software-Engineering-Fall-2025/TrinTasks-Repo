@@ -48,10 +48,19 @@ class ICalParser {
       }
     }
 
-    // Extract DESCRIPTION
-    match = eventData.match(/DESCRIPTION:(.+?)(?:\r?\n(?=[A-Z])|$)/s);
+    // Extract DESCRIPTION - handle multi-line descriptions properly
+    match = eventData.match(/DESCRIPTION:(.+?)(?=\r?\n[A-Z-]+:|$)/s);
     if (match) {
-      event.description = this.decodeText(match[1].trim().replace(/\\n/g, '\n'));
+      // Handle folded lines (lines that start with a space are continuations)
+      let description = match[1].replace(/\r?\n\s/g, '');
+      // Decode HTML entities and iCal escapes
+      description = description.replace(/&#(\d+);/g, (_, code) => String.fromCharCode(code));
+      description = description.replace(/&amp;/g, '&')
+                              .replace(/&lt;/g, '<')
+                              .replace(/&gt;/g, '>')
+                              .replace(/&quot;/g, '"')
+                              .replace(/&#39;/g, "'");
+      event.description = this.decodeText(description.trim());
     }
 
     // Extract LOCATION
@@ -372,13 +381,27 @@ class UIController {
     this.prevMonthBtn = document.getElementById('prevMonth');
     this.nextMonthBtn = document.getElementById('nextMonth');
 
+    // Settings elements
+    this.settingsBtn = document.getElementById('settingsBtn');
+    this.settingsPanel = document.getElementById('settingsPanel');
+    this.closeSettingsBtn = document.getElementById('closeSettings');
+    this.settingsIcalLink = document.getElementById('settingsIcalLink');
+    this.savedCalendarsDiv = document.getElementById('savedCalendars');
+    this.addCalendarBtn = document.getElementById('addCalendarBtn');
+    this.clearDataBtn = document.getElementById('clearDataBtn');
+    this.autoRefreshCheckbox = document.getElementById('autoRefresh');
+    this.saveSettingsBtn = document.getElementById('saveSettings');
+    this.cancelSettingsBtn = document.getElementById('cancelSettings');
+
     this.currentView = 'calendar'; // 'list' or 'calendar' - default to calendar
     this.events = [];
     this.currentMonth = new Date().getMonth();
     this.currentYear = new Date().getFullYear();
+    this.savedCalendars = [];
 
     this.setupEventListeners();
     this.loadSavedData();
+    this.loadSettings();
   }
 
   setupEventListeners() {
@@ -391,6 +414,21 @@ class UIController {
     this.toggleBtn.addEventListener('click', () => this.toggleView());
     this.prevMonthBtn.addEventListener('click', () => this.navigateMonth(-1));
     this.nextMonthBtn.addEventListener('click', () => this.navigateMonth(1));
+
+    // Settings event listeners
+    this.settingsBtn.addEventListener('click', () => this.openSettings());
+    this.closeSettingsBtn.addEventListener('click', () => this.closeSettings());
+    this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
+    this.cancelSettingsBtn.addEventListener('click', () => this.closeSettings());
+    this.addCalendarBtn.addEventListener('click', () => this.addCalendar());
+    this.clearDataBtn.addEventListener('click', () => this.clearAllData());
+
+    // Close settings when clicking outside
+    this.settingsPanel.addEventListener('click', (e) => {
+      if (e.target === this.settingsPanel) {
+        this.closeSettings();
+      }
+    });
   }
 
   async handleParse() {
@@ -620,6 +658,12 @@ class UIController {
   clearError() {
     this.errorMessage.classList.add('hidden');
     this.errorMessage.textContent = '';
+  }
+
+  hideEventsList() {
+    this.mainContent.classList.add('hidden');
+    this.eventsList.classList.add('hidden');
+    this.calendarView.classList.add('hidden');
   }
 
   toggleView() {
@@ -1021,6 +1065,130 @@ class UIController {
 
     const months = Math.floor(days / 30);
     return `${months} month${months > 1 ? 's' : ''} ago`;
+  }
+
+  // Settings methods
+  openSettings() {
+    // Load current settings
+    this.settingsIcalLink.value = this.icalLinkInput.value;
+    this.loadSavedCalendars();
+    this.settingsPanel.classList.remove('hidden');
+  }
+
+  closeSettings() {
+    this.settingsPanel.classList.add('hidden');
+  }
+
+  async saveSettings() {
+    const newUrl = this.settingsIcalLink.value.trim();
+
+    if (newUrl && newUrl !== this.icalLinkInput.value) {
+      this.icalLinkInput.value = newUrl;
+      // Automatically parse the new URL
+      await this.handleParse();
+    }
+
+    // Save auto-refresh setting
+    const autoRefresh = this.autoRefreshCheckbox.checked;
+    await chrome.storage.local.set({ autoRefresh });
+
+    // Setup auto-refresh if enabled
+    if (autoRefresh) {
+      this.setupAutoRefresh();
+    }
+
+    this.closeSettings();
+  }
+
+  async addCalendar() {
+    const url = this.settingsIcalLink.value.trim();
+    if (!url) {
+      alert('Please enter a valid iCal URL');
+      return;
+    }
+
+    // Add to saved calendars
+    if (!this.savedCalendars.includes(url)) {
+      this.savedCalendars.push(url);
+      await chrome.storage.local.set({ savedCalendars: this.savedCalendars });
+      this.loadSavedCalendars();
+    }
+  }
+
+  async loadSavedCalendars() {
+    const data = await chrome.storage.local.get(['savedCalendars']);
+    this.savedCalendars = data.savedCalendars || [];
+
+    // Display saved calendars
+    this.savedCalendarsDiv.innerHTML = '';
+    if (this.savedCalendars.length === 0) {
+      this.savedCalendarsDiv.innerHTML = '<p style="color: #9ca3af; font-size: 12px;">No saved calendars</p>';
+    } else {
+      this.savedCalendars.forEach((url, index) => {
+        const item = document.createElement('div');
+        item.className = 'saved-calendar-item';
+
+        const urlSpan = document.createElement('span');
+        urlSpan.className = 'calendar-url';
+        urlSpan.textContent = url;
+        urlSpan.style.cursor = 'pointer';
+        urlSpan.addEventListener('click', () => {
+          this.settingsIcalLink.value = url;
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-calendar';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => this.deleteCalendar(index));
+
+        item.appendChild(urlSpan);
+        item.appendChild(deleteBtn);
+        this.savedCalendarsDiv.appendChild(item);
+      });
+    }
+  }
+
+  async deleteCalendar(index) {
+    this.savedCalendars.splice(index, 1);
+    await chrome.storage.local.set({ savedCalendars: this.savedCalendars });
+    this.loadSavedCalendars();
+  }
+
+  async clearAllData() {
+    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+      await chrome.storage.local.clear();
+      this.events = [];
+      this.savedCalendars = [];
+      this.icalLinkInput.value = '';
+      this.settingsIcalLink.value = '';
+      this.mainContent.classList.add('hidden');
+      this.viewToggle.classList.add('hidden');
+      this.inputSection.classList.remove('hidden');
+      this.noData.classList.remove('hidden');
+      this.loadSavedCalendars();
+      this.closeSettings();
+    }
+  }
+
+  async loadSettings() {
+    const data = await chrome.storage.local.get(['autoRefresh']);
+    if (data.autoRefresh) {
+      this.autoRefreshCheckbox.checked = true;
+      this.setupAutoRefresh();
+    }
+  }
+
+  setupAutoRefresh() {
+    // Set up periodic refresh (every hour)
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
+
+    this.autoRefreshInterval = setInterval(() => {
+      if (this.icalLinkInput.value) {
+        this.handleParse();
+      }
+    }, 60 * 60 * 1000); // 1 hour
   }
 }
 

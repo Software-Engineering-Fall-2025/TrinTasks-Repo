@@ -386,6 +386,8 @@ class UIController {
     this.addCalendarBtn = document.getElementById('addCalendarBtn');
     this.clearDataBtn = document.getElementById('clearDataBtn');
     this.autoRefreshCheckbox = document.getElementById('autoRefresh');
+    this.enableRemindersCheckbox = document.getElementById('enableReminders');
+    this.reminderHoursSelect = document.getElementById('reminderHours');
     this.saveSettingsBtn = document.getElementById('saveSettings');
     this.cancelSettingsBtn = document.getElementById('cancelSettings');
 
@@ -1207,13 +1209,23 @@ class UIController {
       await this.handleParse();
     }
 
-    // Save auto-refresh setting
+    // Save all settings
     const autoRefresh = this.autoRefreshCheckbox.checked;
-    await chrome.storage.local.set({ autoRefresh });
+    const enableReminders = this.enableRemindersCheckbox.checked;
+    const reminderHours = this.reminderHoursSelect.value;
+
+    await chrome.storage.local.set({
+      autoRefresh,
+      enableReminders,
+      reminderHours
+    });
 
     // Setup auto-refresh if enabled
     if (autoRefresh) {
       this.setupAutoRefresh();
+    } else if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+      this.autoRefreshInterval = null;
     }
 
     this.closeSettings();
@@ -1278,22 +1290,36 @@ class UIController {
       await chrome.storage.local.clear();
       this.events = [];
       this.savedCalendars = [];
+      this.subjectTags = {};
       this.icalLinkInput.value = '';
       this.settingsIcalLink.value = '';
       this.mainContent.classList.add('hidden');
-      this.viewToggle.classList.add('hidden');
       this.inputSection.classList.remove('hidden');
       this.noData.classList.remove('hidden');
+      this.autoRefreshCheckbox.checked = false;
+      this.enableRemindersCheckbox.checked = true;
+      this.reminderHoursSelect.value = '24';
       this.loadSavedCalendars();
+      this.loadSubjectTags();
       this.closeSettings();
     }
   }
 
   async loadSettings() {
-    const data = await chrome.storage.local.get(['autoRefresh']);
+    const data = await chrome.storage.local.get(['autoRefresh', 'enableReminders', 'reminderHours']);
+
+    // Load auto-refresh setting
     if (data.autoRefresh) {
       this.autoRefreshCheckbox.checked = true;
       this.setupAutoRefresh();
+    }
+
+    // Load reminder settings (default to enabled)
+    this.enableRemindersCheckbox.checked = data.enableReminders !== false;
+
+    // Load reminder hours (default to 24)
+    if (data.reminderHours) {
+      this.reminderHoursSelect.value = data.reminderHours;
     }
   }
 

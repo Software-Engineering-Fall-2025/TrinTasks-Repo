@@ -1,6 +1,6 @@
 {
-  "name": "iCal Parser",
-  "description": "Parse and display information from iCal links",
+  "name": "@TrinTasks",
+  "description": "Streamline your task management with TrinTasks - the ultimate to-do list extension for Chrome.",
   "version": "1.0",
   "manifest_version": 3,
   "permissions": [

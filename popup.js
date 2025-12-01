@@ -20,6 +20,17 @@ class ICalParser {
       }
     }
 
+    // Also parse VTODO entries (assignments/tasks)
+    const todoRegex = /BEGIN:VTODO([\s\S]*?)END:VTODO/g;
+    let todoMatch;
+    while ((todoMatch = todoRegex.exec(icalContent)) !== null) {
+      const todoData = todoMatch[1];
+      const todo = this.parseTodo(todoData);
+      if (todo) {
+        events.push(todo);
+      }
+    }
+
     return events;
   }
 
@@ -157,6 +168,43 @@ class ICalParser {
     }
 
     return event;
+  }
+
+  static parseTodo(todoData) {
+    const todo = {};
+    let match;
+
+    match = todoData.match(/SUMMARY:(.+?)(?:\r?\n|$)/);
+    todo.title = match ? this.decodeText(match[1].trim()) : 'Untitled Task';
+
+    match = todoData.match(/DESCRIPTION:(.+?)(?:\r?\n(?=[A-Z])|$)/s);
+    if (match) {
+      todo.description = this.decodeText(match[1].trim().replace(/\\n/g, '\n'));
+    }
+
+    match = todoData.match(/DUE(?:;VALUE=DATE|;TZID=[^:]*)?:(.+?)(?:\r?\n|$)/);
+    if (match) {
+      const rawDue = match[1].trim();
+      todo.startRaw = rawDue; // use startRaw for sorting (due date)
+      todo.startTime = this.formatDateTime(rawDue);
+      todo.dueRaw = rawDue;
+    } else {
+      todo.startRaw = null;
+      todo.startTime = null;
+      todo.dueRaw = null;
+    }
+
+    match = todoData.match(/UID:(.+?)(?:\r?\n|$)/);
+    todo.uid = match ? match[1].trim() : null;
+
+    match = todoData.match(/STATUS:(.+?)(?:\r?\n|$)/);
+    todo.status = match ? match[1].trim() : null;
+
+    // completed timestamp if provided
+    match = todoData.match(/COMPLETED:(.+?)(?:\r?\n|$)/);
+    todo.completed = match ? this.formatDateTime(match[1].trim()) : null;
+
+    return todo;
   }
 
   /**
@@ -379,6 +427,7 @@ class UIController {
 
     this.setupEventListeners();
     this.loadSavedData();
+    this.savedStatuses = {};
   }
 
   setupEventListeners() {
@@ -442,7 +491,7 @@ class UIController {
     console.log('displayEvents called with', events.length, 'events');
     console.log('Sample events:', events.slice(0, 3));
 
-    // Store events for calendar view
+    // Store events for calendar view (full set)
     this.events = events;
 
     // Show event count in header
@@ -451,9 +500,17 @@ class UIController {
       eventCountEl.textContent = `(${events.length} events loaded)`;
     }
 
-    // Sort events by start/due date in reverse chronological order (newest first)
-    // Prioritize DUE date over START date for tasks
-    events.sort((a, b) => {
+    // For performance: only render events for the current month
+    const month = this.currentMonth;
+    const year = this.currentYear;
+
+    const eventsThisMonth = this.filterEventsForMonth(events, month, year);
+
+    // Keep an indexed map of dateStr -> events for fast lookups in calendar rendering
+    this.buildCalendarIndex(eventsThisMonth);
+
+    // Sort the filtered events (newest due first)
+    eventsThisMonth.sort((a, b) => {
       const dateA = a.dueRaw || a.startRaw || a.dueTime || a.startTime;
       const dateB = b.dueRaw || b.startRaw || b.dueTime || b.startTime;
       const ta = ICalParser.iCalDateToTimestamp(dateA);
@@ -463,10 +520,20 @@ class UIController {
 
     this.eventsContainer.innerHTML = '';
 
-    events.forEach(event => {
-      const eventElement = this.createEventElement(event);
-      this.eventsContainer.appendChild(eventElement);
+    // Merge saved statuses into filtered events before rendering
+    eventsThisMonth.forEach(ev => {
+      if (ev && ev.uid && this.savedStatuses && this.savedStatuses[ev.uid]) {
+        ev._savedStatus = this.savedStatuses[ev.uid];
+      }
     });
+
+    // Use a document fragment to minimize reflows
+    const frag = document.createDocumentFragment();
+    eventsThisMonth.forEach(event => {
+      const eventElement = this.createEventElement(event);
+      frag.appendChild(eventElement);
+    });
+    this.eventsContainer.appendChild(frag);
 
     // Hide input section and show main content
     this.inputSection.classList.add('hidden');
@@ -481,11 +548,48 @@ class UIController {
     this.renderCalendar();
   }
 
+  /**
+   * Return events that belong to the given month/year (local timezone)
+   * Uses dueRaw or startRaw when available.
+   */
+  filterEventsForMonth(events, month, year) {
+    if (!Array.isArray(events)) return [];
+    return events.filter(ev => {
+      const raw = ev.dueRaw || ev.startRaw || ev.dueTime || ev.startTime;
+      if (!raw) return false;
+      const part = raw.split('T')[0].replace(/\D/g, '').substring(0, 8);
+      if (part.length !== 8) return false;
+      const evYear = parseInt(part.substring(0,4), 10);
+      const evMonth = parseInt(part.substring(4,6), 10) - 1; // 0-index
+      return evYear === year && evMonth === month;
+    });
+  }
+
+  /**
+   * Build a simple index mapping YYYYMMDD -> [events]
+   * for the currently-rendered month to speed up calendar lookups
+   */
+  buildCalendarIndex(events) {
+    this.calendarEventIndex = {};
+    (events || []).forEach(ev => {
+      const raw = ev.dueRaw || ev.startRaw || ev.dueTime || ev.startTime;
+      if (!raw) return;
+      const datePart = raw.split('T')[0].replace(/\D/g, '').substring(0,8);
+      if (!datePart || datePart.length !== 8) return;
+      if (!this.calendarEventIndex[datePart]) this.calendarEventIndex[datePart] = [];
+      this.calendarEventIndex[datePart].push(ev);
+    });
+  }
+
   createEventElement(event) {
     const eventDiv = document.createElement('div');
     eventDiv.className = 'event';
 
-    let titleHtml = this.escapeHtml(event.title);
+    // Determine effective status (saved by user or provided by calendar)
+    const effectiveStatus = (this.savedStatuses && event.uid && this.savedStatuses[event.uid]) || event.status || null;
+
+    // Decode title (convert HTML entities like &#160;) then split course/title
+    const rawTitleStr = this.decodeHtmlEntities(event.title || '');
 
     // Add assignment indicator for Trinity format
     let typeIcon = '';
@@ -505,11 +609,20 @@ class UIController {
       }
     }
 
-    // Add completed status indicator
-    if (event.status === 'COMPLETED' || event.completedTime) {
-      titleHtml = `✅ <span style="text-decoration: line-through; color: #6b7280;">${typeIcon}${priorityIcon}${titleHtml}</span>`;
+    // Smart-split course and assignment title
+    const split = this.smartSplitTitle(rawTitleStr);
+    let courseName = split.course || null;
+    let assignmentTitle = split.assignment || rawTitleStr;
+
+    const escapedCourse = courseName ? this.escapeHtml(courseName) : '';
+    const escapedAssignmentTitle = this.escapeHtml(assignmentTitle || '');
+
+    // Add completed status indicator (from calendar or user-saved)
+    let titleHtml;
+    if (effectiveStatus === 'COMPLETED' || event.completedTime) {
+      titleHtml = `✅ <div class="title-block"><div class="icons">${typeIcon}${priorityIcon}</div><div class="title-text"><div class="course-name">${escapedCourse}</div><div class="assignment-title" style="color:#6b7280;text-decoration:line-through;">${escapedAssignmentTitle}</div></div></div>`;
     } else {
-      titleHtml = `${typeIcon}${priorityIcon}${titleHtml}`;
+      titleHtml = `<div class="title-block"><div class="icons">${typeIcon}${priorityIcon}</div><div class="title-text"><div class="course-name">${escapedCourse}</div><div class="assignment-title">${escapedAssignmentTitle}</div></div></div>`;
     }
 
     // Add progress indicator if available
@@ -522,7 +635,7 @@ class UIController {
 
     // Show DUE date if available (for tasks/todos)
     if (event.dueTime) {
-      const isOverdue = !event.completedTime && event.dueRaw &&
+      const isOverdue = !(effectiveStatus === 'COMPLETED' || event.completedTime) && event.dueRaw &&
                        ICalParser.iCalDateToTimestamp(event.dueRaw) < Date.now();
       const dueStyle = isOverdue ? 'color: #dc2626; font-weight: 700;' : 'color: #dc2626; font-weight: 600;';
       const dueLabel = isOverdue ? '⚠️ OVERDUE:' : 'Due:';
@@ -582,14 +695,47 @@ class UIController {
         <span class="event-detail-value">${this.escapeHtml(event.rrule)}</span>
       </div>`;
     }
+    // Add status selector so users can update assignment/task status locally
+    const uidForSelect = this.escapeHtml(event.uid || '');
+    // add clear separation from description
+    html += `<div class="event-detail" style="margin-top:10px;border-top:1px solid #e6e6e6;padding-top:8px;">
+      <span class="event-detail-label">Status:</span>
+      <span class="event-detail-value">
+        <select class="status-select" data-uid="${uidForSelect}">
+          <option value="">—</option>
+          <option value="NEEDS-ACTION">Not Started</option>
+          <option value="IN-PROCESS">In Progress</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </span>
+    </div>`;
 
     html += '</div>';
 
     if (event.description) {
-      html += `<div class="event-description">${this.escapeHtml(event.description)}</div>`;
+      const decodedDesc = this.decodeHtmlEntities(event.description || '');
+      html += `<div class="event-description" style="margin-top:8px;">${this.escapeHtml(decodedDesc)}</div>`;
     }
 
     eventDiv.innerHTML = html;
+    // Wire up status select behavior
+    const select = eventDiv.querySelector('.status-select');
+    if (select) {
+      const uid = select.dataset.uid;
+      const current = this.getStatusForEvent(event) || '';
+      select.value = current;
+
+      select.addEventListener('change', async (e) => {
+        const val = e.target.value || null;
+        await this.saveStatusToStorage(uid, val);
+        // Re-render events list to reflect new status/overdue styling
+        if (this.events && this.events.length > 0) {
+          this.displayEvents(this.events);
+        }
+      });
+    }
+
     return eventDiv;
   }
 
@@ -602,6 +748,100 @@ class UIController {
       "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  // Decode HTML entities such as &nbsp; or numeric entities like &#160;
+  decodeHtmlEntities(text) {
+    if (!text) return text;
+    try {
+      const txt = document.createElement('textarea');
+      txt.innerHTML = text;
+      return txt.value;
+    } catch (e) {
+      return text;
+    }
+  }
+
+  /**
+   * Smartly split a raw title into course name and assignment title.
+   * Tries several separators and heuristics to handle cases like:
+   * "English 12, The Basis of Leisure FA: Read Psychology" or
+   * "DREAMS: A SYMPOSIUM/Fa - E: Prophetic Dreams"
+   * Returns { course, assignment }
+   */
+  smartSplitTitle(raw) {
+    if (!raw) return { course: '', assignment: '' };
+    const s = raw.trim();
+
+    // Helper to normalize candidate
+    const normalize = (str) => str.trim();
+
+    // If course names consistently end with " - <letter>", prioritize splitting there.
+    // Example: "English 12, The Basis of Leisure FA - E: Prophetic Dreams"
+    const dashLetterMatch = s.match(/^(.+?\s-\s[A-Za-z])\s*(?:[:\-|–—|\|,]\s*)?(.*)$/);
+    if (dashLetterMatch) {
+      const courseCandidate = normalize(dashLetterMatch[1]);
+      const assignmentCandidate = normalize(dashLetterMatch[2] || '');
+      if (this.isLikelyCourse(courseCandidate)) {
+        return { course: courseCandidate, assignment: assignmentCandidate };
+      }
+    }
+
+    // Try primary separators in order of likelihood
+    const separators = [':', ' - ', ' – ', ' — ', ' | ', '\\|'];
+    for (const sep of separators) {
+      const parts = s.split(new RegExp(sep));
+      if (parts.length >= 2) {
+        const left = normalize(parts[0]);
+        const right = normalize(parts.slice(1).join(typeof sep === 'string' ? sep : ' '));
+        if (this.isLikelyCourse(left)) {
+          return { course: left, assignment: right };
+        }
+        // Sometimes course is on the right (rare) - check the other way
+        if (this.isLikelyCourse(right)) {
+          return { course: right, assignment: left };
+        }
+      }
+    }
+
+    // If no separator worked, try splitting on first comma if left looks like a course
+    if (s.includes(',')) {
+      const idx = s.indexOf(',');
+      const left = normalize(s.substring(0, idx));
+      const right = normalize(s.substring(idx + 1));
+      if (this.isLikelyCourse(left)) return { course: left, assignment: right };
+    }
+
+    // As a fallback, try to detect course-like prefix (e.g., starts with subject+number)
+    const words = s.split('\n')[0].split(/\s+/);
+    if (words.length > 0 && /^[A-Za-z]+\s*\d{1,2}/.test(s)) {
+      // take the first chunk up to a dash or colon if present
+      const m = s.match(/^(.{1,60}?)(?:[:\-|–—|\|,]|$)/);
+      if (m && this.isLikelyCourse(m[1].trim())) {
+        const course = m[1].trim();
+        const assignment = s.substring(m[1].length).replace(/^[:\-|–—|\|,\s]+/, '').trim();
+        return { course, assignment };
+      }
+    }
+
+    // Final fallback: no clear course, return empty course and full string as assignment
+    return { course: '', assignment: s };
+  }
+
+  /**
+   * Heuristic to decide whether a string is likely a course name.
+   * Checks for numbers (grade numbers), semester tokens, short length, or typical words.
+   */
+  isLikelyCourse(str) {
+    if (!str) return false;
+    const s = str.trim();
+    // If it contains semester tokens (FA, SP, SU, FALL, SPRING, SUMMER, WINTER)
+    if (/\b(F\.?A\.?|FA|SP|SU|WI|FALL|SPRING|SUMMER|WINTER|SEM|SEMESTER|TERM|S\d)\b/i.test(s)) return true;
+    // If it contains a course number like 'English 12' or 'MATH 101'
+    if (/\b\d{1,3}\b/.test(s)) return true;
+    // If it's reasonably short (<= 80 chars) and has few verbs (likely a title)
+    if (s.length < 80 && !/\b(read|write|submit|turn in|due|complete|upload)\b/i.test(s)) return true;
+    return false;
   }
 
   showLoading(show) {
@@ -648,12 +888,29 @@ class UIController {
       this.currentMonth = 11;
       this.currentYear--;
     }
+    // Rebuild the calendar index for the newly selected month so the user
+    // can navigate months without re-parsing the iCal feed.
+    if (this.events && this.events.length) {
+      const eventsThisMonth = this.filterEventsForMonth(this.events, this.currentMonth, this.currentYear);
+      this.buildCalendarIndex(eventsThisMonth);
+
+      // If currently in list view, refresh the list to show events for the new month
+      if (this.currentView === 'list') {
+        this.eventsContainer.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        eventsThisMonth.forEach(ev => {
+          const el = this.createEventElement(ev);
+          frag.appendChild(el);
+        });
+        this.eventsContainer.appendChild(frag);
+      }
+    }
+
     this.renderCalendar();
   }
 
   renderCalendar() {
-    console.log('renderCalendar called for', this.currentMonth, this.currentYear);
-    console.log('Total events available:', this.events.length);
+    // renderCalendar called; calendarEventIndex will be used for fast lookups
 
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
@@ -799,30 +1056,28 @@ class UIController {
         const eventTitle = document.createElement('div');
         eventTitle.className = 'day-detail-event-title';
 
-        // Build title with priority and status
-        let titleContent = '';
+        // Decode title and smart-split course/assignment
+        const rawTitle = this.decodeHtmlEntities(event.title || '');
+        const parts = this.smartSplitTitle(rawTitle);
+        let course = parts.course || null;
+        let assignTitle = parts.assignment || rawTitle;
 
-        // Add assignment indicator for Trinity format
-        if (event.isAssignment) {
-          titleContent += '📚 ';
-        }
-
-        // Add priority indicator
+        // Build icons
+        let icons = '';
+        if (event.isAssignment) icons += '📚 ';
         if (event.priority !== undefined) {
-          if (event.priority >= 1 && event.priority <= 3) {
-            titleContent += '🔴 '; // High priority
-          } else if (event.priority >= 4 && event.priority <= 6) {
-            titleContent += '🟡 '; // Medium priority
-          } else if (event.priority >= 7 && event.priority <= 9) {
-            titleContent += '🟢 '; // Low priority
-          }
+          if (event.priority >= 1 && event.priority <= 3) icons += '🔴 ';
+          else if (event.priority >= 4 && event.priority <= 6) icons += '🟡 ';
+          else if (event.priority >= 7 && event.priority <= 9) icons += '🟢 ';
         }
 
-        // Add completed status indicator
+        const escCourse = course ? this.escapeHtml(course) : '';
+        const escAssign = this.escapeHtml(assignTitle);
+
         if (event.status === 'COMPLETED' || event.completedTime) {
-          eventTitle.innerHTML = `✅ <span style="text-decoration: line-through; color: #6b7280;">${titleContent}${this.escapeHtml(event.title)}</span>`;
-        } else {
-          eventTitle.innerHTML = `${titleContent}${this.escapeHtml(event.title)}`;
+              eventTitle.innerHTML = `✅ <div class="course-name">${escCourse}</div><div class="assignment-title" style="color:#6b7280;text-decoration:line-through;">${escAssign}</div>`;
+            } else {
+              eventTitle.innerHTML = `<div class="course-name">${icons}${escCourse}</div><div class="assignment-title">${escAssign}</div>`;
         }
 
         // Add progress indicator if available
@@ -840,7 +1095,7 @@ class UIController {
           const eventDue = document.createElement('div');
           eventDue.className = 'day-detail-event-time';
 
-          const isOverdue = !event.completedTime && event.dueRaw &&
+          const isOverdue = !(this.getStatusForEvent(event) === 'COMPLETED' || event.completedTime) && event.dueRaw &&
                            ICalParser.iCalDateToTimestamp(event.dueRaw) < Date.now();
 
           if (isOverdue) {
@@ -886,9 +1141,63 @@ class UIController {
         if (event.description) {
           const eventDesc = document.createElement('div');
           eventDesc.className = 'day-detail-event-description';
-          eventDesc.textContent = event.description;
+          eventDesc.textContent = this.decodeHtmlEntities(event.description || '');
           eventDiv.appendChild(eventDesc);
         }
+
+        // Add a status selector for the day-detail view
+        const statusWrapper = document.createElement('div');
+        statusWrapper.className = 'day-detail-event-status';
+        statusWrapper.style.cssText = 'margin-top:8px;border-top:1px solid #e6e6e6;padding-top:8px;';
+        const statusLabel = document.createElement('span');
+        statusLabel.textContent = 'Status: ';
+        statusLabel.style.fontWeight = '600';
+        statusWrapper.appendChild(statusLabel);
+
+        const statusSelect = document.createElement('select');
+        statusSelect.className = 'status-select';
+        statusSelect.dataset.uid = event.uid || '';
+        ['','NEEDS-ACTION','IN-PROCESS','COMPLETED','CANCELLED'].forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v === '' ? '—' : (v === 'NEEDS-ACTION' ? 'Not Started' : (v === 'IN-PROCESS' ? 'In Progress' : (v === 'COMPLETED' ? 'Completed' : 'Cancelled')));
+          statusSelect.appendChild(opt);
+        });
+
+        // Set current value
+        const currentStatus = this.getStatusForEvent(event) || '';
+        statusSelect.value = currentStatus;
+
+        statusSelect.addEventListener('change', async (e) => {
+          const val = e.target.value || null;
+          await this.saveStatusToStorage(event.uid, val);
+          // Update UI in place for this modal item: rebuild title with same rules
+          const titleEl = eventDiv.querySelector('.day-detail-event-title');
+          const raw = this.decodeHtmlEntities(event.title || '');
+          const parts2 = this.smartSplitTitle(raw);
+          let course = parts2.course || null;
+          let assignTitle = parts2.assignment || raw;
+
+          let icons2 = '';
+          if (event.isAssignment) icons2 += '📚 ';
+          if (event.priority !== undefined) {
+            if (event.priority >= 1 && event.priority <= 3) icons2 += '🔴 ';
+            else if (event.priority >= 4 && event.priority <= 6) icons2 += '🟡 ';
+            else if (event.priority >= 7 && event.priority <= 9) icons2 += '🟢 ';
+          }
+
+          const escCourse2 = course ? this.escapeHtml(course) : '';
+          const escAssign2 = this.escapeHtml(assignTitle);
+
+          if (val === 'COMPLETED') {
+            titleEl.innerHTML = `✅ <div style="font-weight:700">${escCourse2}</div><div style="color:#6b7280">${escAssign2}</div>`;
+          } else {
+            titleEl.innerHTML = `<div style="font-weight:700">${icons2}${escCourse2}</div><div>${escAssign2}</div>`;
+          }
+        });
+
+        statusWrapper.appendChild(statusSelect);
+        eventDiv.appendChild(statusWrapper);
 
         eventsContainer.appendChild(eventDiv);
       });
@@ -942,37 +1251,9 @@ class UIController {
 
     console.log(`Looking for events on ${year}-${month}-${day} (${dateStr}), total events: ${this.events.length}`);
 
-    const matchingEvents = this.events.filter(event => {
-      // Check for DUE date first (for tasks/todos), then fall back to START date
-      const eventDateRaw = event.dueRaw || event.startRaw;
-
-      if (!eventDateRaw) {
-        console.log('  Event has no date:', event);
-        return false;
-      }
-
-      // Extract just the date part (YYYYMMDD or YYYYMMDDTHHMMSS)
-      const eventDatePart = eventDateRaw.split('T')[0];
-
-      // Remove any non-digit characters
-      const eventDateStr = eventDatePart.replace(/\D/g, '').substring(0, 8);
-
-      const matches = eventDateStr === dateStr;
-      if (matches) {
-        const dateType = event.dueRaw ? 'DUE' : 'START';
-        console.log(`  ✓ Match found: "${event.title}" with ${dateType} date=${eventDateRaw} -> ${eventDateStr}`);
-      } else {
-        // Log first few mismatches for debugging
-        if (Math.random() < 0.1) {
-          console.log(`  ✗ No match: "${event.title}" ${eventDateStr} !== ${dateStr}`);
-        }
-      }
-
-      return matches;
-    });
-
-    console.log(`  Found ${matchingEvents.length} matching events`);
-    return matchingEvents;
+    // Use prebuilt index if available
+    const eventsForDay = this.calendarEventIndex && this.calendarEventIndex[dateStr] ? this.calendarEventIndex[dateStr] : [];
+    return eventsForDay;
   }
 
   async saveToStorage(url, events) {
@@ -990,16 +1271,43 @@ class UIController {
 
   async loadSavedData() {
     try {
-      const data = await chrome.storage.local.get(['icalUrl', 'events', 'lastUpdated']);
+      const data = await chrome.storage.local.get(['icalUrl', 'events', 'lastUpdated', 'statuses']);
+
+      this.savedStatuses = data.statuses || {};
 
       if (data.icalUrl && data.events) {
         this.icalLinkInput.value = data.icalUrl;
-        this.displayEvents(data.events);
-        console.log('Loaded saved data from storage');
+        // Defer heavy rendering to the next tick so popup can appear quickly
+        setTimeout(() => this.displayEvents(data.events), 0);
       }
     } catch (error) {
       console.error('Failed to load from storage:', error);
     }
+  }
+
+  async saveStatusToStorage(uid, status) {
+    if (!uid) return;
+    this.savedStatuses = this.savedStatuses || {};
+    if (status) {
+      this.savedStatuses[uid] = status;
+    } else {
+      delete this.savedStatuses[uid];
+    }
+
+    try {
+      await chrome.storage.local.set({ statuses: this.savedStatuses });
+      console.log('Saved status for', uid, status);
+    } catch (e) {
+      console.error('Failed to save status:', e);
+    }
+  }
+
+  getStatusForEvent(event) {
+    if (!event) return null;
+    if (event.uid && this.savedStatuses && this.savedStatuses[event.uid]) {
+      return this.savedStatuses[event.uid];
+    }
+    return event.status || null;
   }
 
   getTimeAgo(date) {

@@ -445,16 +445,19 @@ class UIController {
 
     // Settings elements
     this.settingsIcalLink = document.getElementById('settingsIcalLink');
+    this.refreshCalendarBtn = document.getElementById('refreshCalendarBtn');
     this.clearDataBtn = document.getElementById('clearDataBtn');
     this.autoRefreshCheckbox = document.getElementById('autoRefresh');
     this.enableRemindersCheckbox = document.getElementById('enableReminders');
     this.reminderHoursSelect = document.getElementById('reminderHours');
+    this.themeOptions = document.getElementById('themeOptions');
 
     // Subject tags elements
     this.subjectTagsDiv = document.getElementById('subjectTags');
 
     this.events = [];
     this.subjectTags = {};
+    this.currentTheme = 'fern';
     this.isSettingsView = false;
     this.filterMode = 'all';
 
@@ -463,9 +466,16 @@ class UIController {
     this.selectedDate = new Date();
 
     this.setupEventListeners();
-    this.loadSavedData();
+    const loadPromise = this.loadSavedData();
     this.loadSettings();
     this.loadSubjectTags();
+    this.listenForStorageChanges();
+    // Kick off a background refresh as soon as cached data is present
+    loadPromise.then(hasData => {
+      if (hasData) {
+        this.requestBackgroundRefresh();
+      }
+    });
   }
 
   getWeekStart(date) {
@@ -493,10 +503,15 @@ class UIController {
         this.closeSettings();
       }
     });
+    if (this.refreshCalendarBtn) {
+      this.refreshCalendarBtn.addEventListener('click', () => this.handleManualRefresh());
+    }
     this.clearDataBtn.addEventListener('click', () => this.clearAllData());
 
     // Auto-save on settings change
-    this.autoRefreshCheckbox.addEventListener('change', () => this.saveSettings());
+    if (this.autoRefreshCheckbox) {
+      this.autoRefreshCheckbox.addEventListener('change', () => this.saveSettings());
+    }
     this.enableRemindersCheckbox.addEventListener('change', () => this.saveSettings());
     this.reminderHoursSelect.addEventListener('change', () => this.saveSettings());
 
@@ -506,6 +521,19 @@ class UIController {
         btn.addEventListener('click', () => {
           const mode = btn.getAttribute('data-mode');
           this.setFilterMode(mode);
+        });
+      });
+    }
+
+    // Theme selection
+    if (this.themeOptions) {
+      this.themeOptions.querySelectorAll('.theme-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const theme = btn.getAttribute('data-theme-option');
+          if (theme) {
+            this.applyTheme(theme);
+            this.saveSettings(); // persist theme choice
+          }
         });
       });
     }
@@ -564,6 +592,8 @@ class UIController {
 
     // Store events
     this.events = events;
+    // Build subject tags from the full set up front so Settings shows them immediately
+    this.ensureSubjectTags(events);
 
     // Hide input section and show main content
     this.inputSection.classList.add('hidden');
@@ -989,17 +1019,16 @@ class UIController {
       event.completedDate = new Date().toISOString();
     }
 
-    // Save updated completion status
-    await chrome.storage.local.set({ completedAssignments });
-
     // Quick celebration confetti when marking complete
     if (event.isCompleted && eventElement) {
       this.animateCompletion(eventElement);
-      setTimeout(() => {
+      setTimeout(async () => {
+        await chrome.storage.local.set({ completedAssignments });
         this.renderWeekView();
         this.showEventsForSelectedDay();
-      }, 850);
+      }, 1200);
     } else {
+      await chrome.storage.local.set({ completedAssignments });
       // Re-render week view and events
       this.renderWeekView();
       this.showEventsForSelectedDay();
@@ -1012,17 +1041,11 @@ class UIController {
 
       if (data.icalUrl && data.events) {
         this.icalLinkInput.value = data.icalUrl;
+        this.settingsIcalLink.value = data.icalUrl;
 
         // Merge completion status with cached events
         const completedAssignments = data.completedAssignments || {};
-        const cachedEvents = data.events.map(event => {
-          const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
-          if (completedAssignments[eventId]) {
-            event.isCompleted = true;
-            event.completedDate = completedAssignments[eventId].completedDate;
-          }
-          return event;
-        });
+        const cachedEvents = this.mergeCompletionStatus(data.events, completedAssignments);
 
         this.displayEvents(cachedEvents);
 
@@ -1032,9 +1055,200 @@ class UIController {
         }
 
         console.log('Loaded cached data from storage');
+        return true;
       }
     } catch (error) {
       console.error('Failed to load from storage:', error);
+    }
+    return false;
+  }
+
+  mergeCompletionStatus(events, completedAssignments) {
+    const completed = completedAssignments || {};
+    return (events || []).map(event => {
+      const merged = { ...event };
+      const eventId = merged.uid || `${merged.title}_${merged.dueRaw || merged.startRaw}`;
+      if (completed[eventId]) {
+        merged.isCompleted = true;
+        merged.completedDate = completed[eventId].completedDate;
+      } else {
+        merged.isCompleted = false;
+        merged.completedDate = null;
+      }
+      return merged;
+    });
+  }
+
+  applyTheme(theme) {
+    const themeClass = `theme-${theme || 'fern'}`;
+    const themes = ['theme-fern', 'theme-ocean', 'theme-sunset', 'theme-slate', 'theme-orchid', 'theme-midnight'];
+    themes.forEach(t => document.body.classList.remove(t));
+    // enable a short transition class
+    document.body.classList.add('theme-animating');
+    setTimeout(() => document.body.classList.remove('theme-animating'), 400);
+
+    if (themes.includes(themeClass)) {
+      document.body.classList.add(themeClass);
+      this.currentTheme = theme || 'fern';
+    } else {
+      document.body.classList.add('theme-fern');
+      this.currentTheme = 'fern';
+    }
+
+    if (this.themeOptions) {
+      this.themeOptions.querySelectorAll('.theme-pill').forEach(btn => {
+        const val = btn.getAttribute('data-theme-option');
+        btn.classList.toggle('selected', val === this.currentTheme);
+      });
+    }
+  }
+
+  listenForStorageChanges() {
+    chrome.storage.onChanged.addListener(async (changes, areaName) => {
+      if (areaName !== 'local') return;
+
+      const eventsChanged = changes.events || changes.completedAssignments || changes.icalUrl;
+      if (eventsChanged) {
+        await this.updateEventsFromStorage();
+      }
+
+      if (changes.lastRefreshSummary && changes.lastRefreshSummary.newValue) {
+        this.showRefreshToast(changes.lastRefreshSummary.newValue);
+      }
+
+      if (changes.theme && changes.theme.newValue) {
+        this.applyTheme(changes.theme.newValue);
+      }
+    });
+  }
+
+  async requestBackgroundRefresh() {
+    const currentUrl = this.icalLinkInput.value.trim() || this.settingsIcalLink.value.trim();
+    if (!currentUrl) {
+      this.showError('Please add an iCal link first');
+      return;
+    }
+    await chrome.storage.local.set({ icalUrl: currentUrl });
+
+    const response = await new Promise(resolve => {
+      try {
+        chrome.runtime.sendMessage({ action: 'refreshCalendarNow', icalUrl: currentUrl }, (resp) => {
+          if (chrome.runtime.lastError) {
+            resolve({ success: false, error: chrome.runtime.lastError.message });
+          } else {
+            resolve(resp);
+          }
+        });
+      } catch (err) {
+        resolve({ success: false, error: err?.message || 'Unable to contact background' });
+      }
+    });
+
+    if (!response || !response.success) {
+      console.warn('Background refresh failed or no response', response && response.error);
+      try {
+        await this.refreshLocally(currentUrl);
+        await this.updateEventsFromStorage();
+      } catch (err) {
+        this.showError(response && response.error ? response.error : 'Could not refresh calendar. Please try again.');
+        return;
+      }
+    } else {
+      await this.updateEventsFromStorage();
+    }
+  }
+
+  async refreshLocally(url) {
+    const data = await chrome.storage.local.get(['events', 'completedAssignments']);
+    const previousEvents = data.events || [];
+    const completedAssignments = data.completedAssignments || {};
+
+    const newEvents = await ICalParser.fetchAndParse(url);
+
+    const prevMap = new Map();
+    previousEvents.forEach(ev => {
+      const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
+      prevMap.set(id, ev);
+    });
+
+    const nextEvents = [];
+    let added = 0;
+    let updated = 0;
+
+    newEvents.forEach(ev => {
+      const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
+      const prev = prevMap.get(id);
+      if (!prev) {
+        added++;
+      } else {
+        const prevClone = { ...prev };
+        delete prevClone.isCompleted;
+        delete prevClone.completedDate;
+        const currClone = { ...ev };
+        if (JSON.stringify(prevClone) !== JSON.stringify(currClone)) {
+          updated++;
+        }
+      }
+      if (completedAssignments[id]) {
+        ev.isCompleted = true;
+        ev.completedDate = completedAssignments[id].completedDate;
+      }
+      nextEvents.push(ev);
+    });
+
+    const nextIds = new Set(nextEvents.map(ev => ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`));
+    let removed = 0;
+    previousEvents.forEach(ev => {
+      const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
+      if (!nextIds.has(id)) {
+        removed++;
+        delete completedAssignments[id];
+      }
+    });
+
+    await chrome.storage.local.set({
+      events: nextEvents,
+      completedAssignments,
+      lastUpdated: new Date().toISOString(),
+      lastRefreshSummary: {
+        added,
+        updated,
+        removed,
+        timestamp: Date.now()
+      }
+    });
+  }
+
+  async handleManualRefresh() {
+    try {
+      if (this.refreshCalendarBtn) {
+        this.refreshCalendarBtn.disabled = true;
+        this.refreshCalendarBtn.textContent = 'Refreshing...';
+      }
+      this.showLoading(true);
+      await this.requestBackgroundRefresh();
+    } finally {
+      this.showLoading(false);
+      if (this.refreshCalendarBtn) {
+        this.refreshCalendarBtn.disabled = false;
+        this.refreshCalendarBtn.textContent = 'Refresh Calendar';
+      }
+    }
+  }
+
+  async updateEventsFromStorage() {
+    try {
+      const data = await chrome.storage.local.get(['events', 'completedAssignments', 'icalUrl']);
+      if (data.icalUrl) {
+        this.icalLinkInput.value = data.icalUrl;
+        this.settingsIcalLink.value = data.icalUrl;
+      }
+      const merged = this.mergeCompletionStatus(data.events || [], data.completedAssignments);
+      if (merged.length > 0) {
+        this.displayEvents(merged);
+      }
+    } catch (error) {
+      console.error('Failed to update events from storage:', error);
     }
   }
 
@@ -1111,14 +1325,16 @@ class UIController {
 
   async saveSettings() {
     // Save all settings
-    const autoRefresh = this.autoRefreshCheckbox.checked;
+    const autoRefresh = this.autoRefreshCheckbox ? this.autoRefreshCheckbox.checked : false;
     const enableReminders = this.enableRemindersCheckbox.checked;
     const reminderHours = parseInt(this.reminderHoursSelect.value, 10) || 24;
+    const theme = this.currentTheme || 'fern';
 
     await chrome.storage.local.set({
       autoRefresh,
       enableReminders,
       reminderHours,
+      theme,
       reminderSettings: {
         enabled: enableReminders,
         hours: reminderHours
@@ -1144,22 +1360,17 @@ class UIController {
       this.mainContent.classList.add('hidden');
       this.inputSection.classList.remove('hidden');
       this.noData.classList.remove('hidden');
-      this.autoRefreshCheckbox.checked = false;
+      if (this.autoRefreshCheckbox) this.autoRefreshCheckbox.checked = false;
       this.enableRemindersCheckbox.checked = true;
       this.reminderHoursSelect.value = '24';
       this.loadSubjectTags();
+      this.applyTheme('fern');
       this.closeSettings();
     }
   }
 
   async loadSettings() {
-    const data = await chrome.storage.local.get(['autoRefresh', 'enableReminders', 'reminderHours', 'reminderSettings']);
-
-    // Load auto-refresh setting
-    if (data.autoRefresh) {
-      this.autoRefreshCheckbox.checked = true;
-      this.setupAutoRefresh();
-    }
+    const data = await chrome.storage.local.get(['autoRefresh', 'enableReminders', 'reminderHours', 'reminderSettings', 'theme']);
 
     // Load reminder settings (default to enabled)
     this.enableRemindersCheckbox.checked = data.enableReminders !== false;
@@ -1167,6 +1378,9 @@ class UIController {
     // Load reminder hours (default to 24)
     const hrs = (data.reminderSettings && data.reminderSettings.hours) || data.reminderHours || 24;
     this.reminderHoursSelect.value = String(hrs);
+
+    // Load theme
+    this.applyTheme(data.theme || 'fern');
   }
 
   setupAutoRefresh() {
@@ -1220,7 +1434,14 @@ class UIController {
       colorIndicator.className = 'tag-color-indicator';
       colorIndicator.style.backgroundColor = color;
       colorIndicator.title = 'Click to change color';
-      colorIndicator.addEventListener('click', () => colorInput.click());
+      // Custom mini palette anchored to the indicator
+      const popover = this.buildColorPopover(name, colorInput, colorIndicator);
+      colorIndicator.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.color-popover').forEach(p => p.classList.add('hidden'));
+        popover.classList.toggle('hidden');
+      });
+      document.addEventListener('click', () => popover.classList.add('hidden'));
 
       const tagName = document.createElement('span');
       tagName.className = 'tag-name';
@@ -1228,6 +1449,7 @@ class UIController {
 
       tagDiv.appendChild(colorInput);
       tagDiv.appendChild(colorIndicator);
+      tagDiv.appendChild(popover);
       tagDiv.appendChild(tagName);
       this.subjectTagsDiv.appendChild(tagDiv);
     });
@@ -1282,6 +1504,12 @@ class UIController {
     const coursePart = title.substring(0, lastColon).trim();
     // Trim any trailing separators
     return coursePart.replace(/[\-:;\|\/]\s*$/, '').trim();
+  }
+
+  ensureSubjectTags(events) {
+    if (!events) return;
+    events.forEach(ev => this.getSubjectFromTitle(ev.title || ''));
+    this.displaySubjectTags();
   }
 
   getDefaultColorForSubject(subject) {
@@ -1341,6 +1569,77 @@ class UIController {
     return title.replace(/\s+\d+$/, '').trim();
   }
 
+  buildColorPopover(subjectName, colorInput, indicator) {
+    const popover = document.createElement('div');
+    popover.className = 'color-popover hidden';
+    const palette = this.getThemePaletteColors();
+
+    palette.forEach(hex => {
+      const sw = document.createElement('button');
+      sw.type = 'button';
+      sw.className = 'color-swatch-btn';
+      sw.style.backgroundColor = hex;
+      sw.addEventListener('click', async () => {
+        indicator.style.backgroundColor = hex;
+        colorInput.value = hex;
+        await this.updateSubjectTagColor(subjectName, hex);
+        popover.classList.add('hidden');
+      });
+      popover.appendChild(sw);
+    });
+
+    const customBtn = document.createElement('button');
+    customBtn.type = 'button';
+    customBtn.className = 'color-swatch-btn custom';
+    customBtn.textContent = 'Custom';
+    customBtn.addEventListener('click', () => {
+      colorInput.click();
+      popover.classList.add('hidden');
+    });
+    popover.appendChild(customBtn);
+
+    return popover;
+  }
+
+  getThemePaletteColors() {
+    const style = getComputedStyle(document.body);
+    const accent = style.getPropertyValue('--accent').trim() || '#3b82f6';
+    const accentStrong = style.getPropertyValue('--accent-strong').trim() || accent;
+    const header = style.getPropertyValue('--header-bg').trim() || accent;
+    const surface = style.getPropertyValue('--surface').trim() || '#ffffff';
+    const mix = (a, bColor, t = 0.5) => {
+      const toRGB = (hex) => {
+        let clean = (hex || '').replace('#', '');
+        if (/^[0-9a-fA-F]{3}$/.test(clean)) {
+          clean = clean.split('').map(ch => ch + ch).join('');
+        }
+        if (!/^[0-9a-fA-F]{6}$/.test(clean)) return [0, 0, 0];
+        return [
+          parseInt(clean.substring(0, 2), 16),
+          parseInt(clean.substring(2, 4), 16),
+          parseInt(clean.substring(4, 6), 16)
+        ];
+      };
+      const [r1, g1, b1] = toRGB(a);
+      const [r2, g2, b2] = toRGB(bColor);
+      const r = Math.round(r1 + (r2 - r1) * t);
+      const g = Math.round(g1 + (g2 - g1) * t);
+      const b = Math.round(b1 + (b2 - b1) * t);
+      return `#${r.toString(16).padStart(2, '0')}${g
+        .toString(16)
+        .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    };
+
+    return [
+      accent,
+      accentStrong,
+      header,
+      mix(accent, surface, 0.25),
+      mix(accentStrong, surface, 0.5),
+      mix(header, surface, 0.35)
+    ];
+  }
+
   showRefreshToast(summary) {
     const toast = document.getElementById('refreshToast');
     if (!toast || !summary) return;
@@ -1372,7 +1671,7 @@ class UIController {
       target.style.transform = '';
       target.style.opacity = '';
       target.classList.add('moving-down');
-    }, 900); // wait for confetti to finish falling
+    }, 900); // match original flow for confetti + slide
     this.launchConfetti(target);
   }
 
@@ -1380,7 +1679,8 @@ class UIController {
     if (!target) return;
     const container = document.createElement('div');
     container.className = 'confetti-container';
-    const colors = ['#e63946', '#f77f00', '#2a9d8f', '#118ab2', '#8338ec', '#ff006e', '#8ac926'];
+    const themeColors = this.getThemeConfettiColors();
+    const colors = themeColors.length ? themeColors : ['#e63946', '#f77f00', '#2a9d8f', '#118ab2', '#8338ec', '#ff006e', '#8ac926'];
 
     for (let i = 0; i < 14; i++) {
       const piece = document.createElement('span');
@@ -1396,6 +1696,35 @@ class UIController {
     setTimeout(() => {
       container.remove();
     }, 1200);
+  }
+
+  getThemeConfettiColors() {
+    try {
+      const style = getComputedStyle(document.body);
+      const accent = style.getPropertyValue('--accent').trim() || '#3b82f6';
+      const accentStrong = style.getPropertyValue('--accent-strong').trim() || accent;
+      const header = style.getPropertyValue('--header-bg').trim() || accent;
+      const contrast = style.getPropertyValue('--accent-contrast').trim() || '#ffffff';
+      const lighten = (hex, amt) => {
+        const clean = hex.replace('#', '');
+        if (!/^[0-9a-fA-F]{6}$/.test(clean)) return hex;
+        const num = parseInt(clean, 16);
+        const r = Math.min(255, Math.max(0, (num >> 16) + amt));
+        const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amt));
+        const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amt));
+        return `#${(b | (g << 8) | (r << 16)).toString(16).padStart(6, '0')}`;
+      };
+      return [
+        accent,
+        accentStrong,
+        header,
+        contrast,
+        lighten(accent.replace('#', ''), 30),
+        lighten(accentStrong.replace('#', ''), 45)
+      ];
+    } catch (e) {
+      return [];
+    }
   }
 }
 

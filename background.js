@@ -140,10 +140,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // Also refresh on startup
 refreshCalendarData();
 
-async function refreshCalendarData() {
+async function refreshCalendarData(overrideUrl) {
   try {
     const data = await chrome.storage.local.get(['icalUrl', 'events', 'completedAssignments']);
-    const icalUrl = data.icalUrl;
+    const icalUrl = overrideUrl || data.icalUrl;
     if (!icalUrl) return;
 
     const previousEvents = data.events || [];
@@ -207,10 +207,26 @@ async function refreshCalendarData() {
       }
     });
     console.log(`Calendar refreshed: +${added}, updated ${updated}, removed ${removed}`);
+    return { added, updated, removed, timestamp: Date.now() };
   } catch (err) {
     console.error('Failed to refresh calendar in background:', err);
+    throw err;
   }
 }
+
+// Allow popup to request an immediate refresh when opened
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message && message.action === 'refreshCalendarNow') {
+    const overrideUrl = message.icalUrl || null;
+    if (overrideUrl) {
+      chrome.storage.local.set({ icalUrl: overrideUrl });
+    }
+    refreshCalendarData(overrideUrl)
+      .then(summary => sendResponse({ success: true, summary }))
+      .catch(error => sendResponse({ success: false, error: error?.message || 'Unknown error' }));
+    return true; // keep the message channel open for async response
+  }
+});
 
 // Minimal iCal parser (based on popup logic) for background refresh
 class ICalParser {

@@ -80,6 +80,7 @@
             >
           </div>
           <div class="settings-group settings-buttons-row">
+            <button id="refreshCalendarBtn" class="btn-primary" type="button">Refresh Calendar</button>
             <button id="clearDataBtn" class="btn-danger">Clear All Data</button>
           </div>
         </div>
@@ -87,13 +88,6 @@
         <!-- Notifications Section -->
         <div class="settings-section">
           <h3 class="settings-section-title">Notifications</h3>
-          <div class="settings-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="autoRefresh" checked disabled>
-              <span>Calendar auto-refreshes every 30 minutes in the background</span>
-            </label>
-            <p class="settings-note">Completion status is preserved; removed items are dropped automatically.</p>
-          </div>
           <div class="settings-group">
             <label class="checkbox-label">
               <input type="checkbox" id="enableReminders">
@@ -111,6 +105,32 @@
                 <option value="48">48 hours</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <!-- Theme Section -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Theme</h3>
+          <p class="settings-hint">Pick a color vibe for the header, buttons, and cards</p>
+          <div class="settings-group theme-options" id="themeOptions">
+            <button type="button" class="theme-pill" data-theme-option="fern">
+              <span class="swatch swatch-fern"></span>Fern
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="ocean">
+              <span class="swatch swatch-ocean"></span>Ocean
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="sunset">
+              <span class="swatch swatch-sunset"></span>Sunset
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="slate">
+              <span class="swatch swatch-slate"></span>Slate
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="orchid">
+              <span class="swatch swatch-orchid"></span>Orchid
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="midnight">
+              <span class="swatch swatch-midnight"></span>Midnight
+            </button>
           </div>
         </div>
 

@@ -458,6 +458,9 @@ class UIController {
     this.events = [];
     this.subjectTags = {};
     this.currentTheme = 'fern';
+    this.serenityWeatherCache = null;
+    this.serenityRefreshTimer = null;
+    this.serenityApplying = false;
     this.isSettingsView = false;
     this.filterMode = 'all';
 
@@ -1056,22 +1059,11 @@ class UIController {
 
         console.log('Loaded cached data from storage');
         return true;
-      } else {
-        // No data found; show setup instructions
-        this.showSetupInstructions();
       }
     } catch (error) {
       console.error('Failed to load from storage:', error);
-      // On error, show setup instructions as fallback
-      this.showSetupInstructions();
     }
     return false;
-  }
-
-  showSetupInstructions() {
-    this.inputSection.classList.remove('hidden');
-    this.noData.classList.remove('hidden');
-    this.mainContent.classList.add('hidden');
   }
 
   mergeCompletionStatus(events, completedAssignments) {
@@ -1091,19 +1083,30 @@ class UIController {
   }
 
   applyTheme(theme) {
-    const themeClass = `theme-${theme || 'fern'}`;
-    const themes = ['theme-fern', 'theme-ocean', 'theme-sunset', 'theme-slate', 'theme-orchid', 'theme-midnight'];
+    const selectedTheme = theme || 'fern';
+    const themeClass = `theme-${selectedTheme}`;
+    const themes = ['theme-fern', 'theme-ocean', 'theme-sunset', 'theme-slate', 'theme-orchid', 'theme-midnight', 'theme-serenity'];
     themes.forEach(t => document.body.classList.remove(t));
+
+    // Clear dynamic serenity overrides when leaving the mode
+    if (selectedTheme !== 'serenity') {
+      this.clearSerenityOverrides();
+    }
+
     // enable a short transition class
     document.body.classList.add('theme-animating');
     setTimeout(() => document.body.classList.remove('theme-animating'), 400);
 
-    if (themes.includes(themeClass)) {
-      document.body.classList.add(themeClass);
-      this.currentTheme = theme || 'fern';
-    } else {
+    if (!themes.includes(themeClass)) {
       document.body.classList.add('theme-fern');
       this.currentTheme = 'fern';
+    } else if (themeClass === 'theme-serenity') {
+      document.body.classList.add('theme-serenity');
+      this.currentTheme = 'serenity';
+      this.applySerenityTheme();
+    } else {
+      document.body.classList.add(themeClass);
+      this.currentTheme = selectedTheme;
     }
 
     if (this.themeOptions) {
@@ -1649,6 +1652,302 @@ class UIController {
       mix(accentStrong, surface, 0.5),
       mix(header, surface, 0.35)
     ];
+  }
+
+  async applySerenityTheme(forceWeatherRefresh = false) {
+    if (this.serenityApplying || this.currentTheme !== 'serenity') return;
+    this.serenityApplying = true;
+    try {
+      const now = new Date();
+      const phase = this.getSerenityPhase(now);
+      const weather = await this.getSerenityWeather(forceWeatherRefresh);
+      const palette = this.buildSerenityPalette(phase, weather);
+      this.setSerenityVariables(palette);
+      this.scheduleSerenityRefresh(now);
+    } catch (err) {
+      console.warn('Serenity theme failed; falling back to static palette.', err);
+    } finally {
+      this.serenityApplying = false;
+    }
+  }
+
+  getSerenityPhase(date = new Date()) {
+    const hour = date.getHours();
+    if (hour >= 5 && hour < 8) return 'dawn';
+    if (hour >= 8 && hour < 11) return 'morning';
+    if (hour >= 11 && hour < 16) return 'day';
+    if (hour >= 16 && hour < 19) return 'golden';
+    if (hour >= 19 && hour < 22) return 'evening';
+    return 'night';
+  }
+
+  async getSerenityWeather(forceRefresh = false) {
+    if (!forceRefresh && this.serenityWeatherCache && Date.now() - this.serenityWeatherCache.timestamp < 30 * 60 * 1000) {
+      return this.serenityWeatherCache;
+    }
+
+    if (!navigator.geolocation) {
+      const fallback = { condition: 'clear', source: 'time-only', timestamp: Date.now() };
+      this.serenityWeatherCache = fallback;
+      return fallback;
+    }
+
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000, maximumAge: 20 * 60 * 1000 });
+      });
+      const { latitude, longitude } = position.coords;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=weather_code,temperature_2m&timezone=auto`;
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        throw new Error(`Weather fetch failed: ${resp.status}`);
+      }
+      const data = await resp.json();
+      const code = data?.current?.weather_code;
+      const condition = this.mapWeatherCodeToCondition(code);
+      const snapshot = { condition, code, timestamp: Date.now(), source: 'open-meteo' };
+      this.serenityWeatherCache = snapshot;
+      return snapshot;
+    } catch (err) {
+      console.warn('Serenity weather lookup failed; using clear fallback.', err);
+      const fallback = { condition: 'clear', source: 'fallback', timestamp: Date.now() };
+      this.serenityWeatherCache = fallback;
+      return fallback;
+    }
+  }
+
+  mapWeatherCodeToCondition(code) {
+    if (code === 0) return 'clear';
+    if ([1, 2, 3].includes(code)) return 'clouds';
+    if ([45, 48].includes(code)) return 'fog';
+    if ([51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(code)) return 'rain';
+    if ([66, 67, 77].includes(code)) return 'sleet';
+    if ([71, 73, 75, 85, 86].includes(code)) return 'snow';
+    if ([95, 96, 99].includes(code)) return 'storm';
+    return 'clear';
+  }
+
+  buildSerenityPalette(phase, weather = {}) {
+    const basePalettes = {
+      dawn: {
+        pageBg: '#e9effc',
+        surface: '#fdfdff',
+        textMain: '#0f1b2d',
+        textMuted: '#47607c',
+        headerBg: '#213b63',
+        headerText: '#eef3ff',
+        accent: '#8cbdf5',
+        accentStrong: '#5d8ed9',
+        accentContrast: '#0d1a2b',
+        cardBg: '#f2f6ff',
+        cardBorder: '#d6e2f3',
+        toastBg: '#213b63'
+      },
+      morning: {
+        pageBg: '#eaf7f2',
+        surface: '#ffffff',
+        textMain: '#10303a',
+        textMuted: '#4a6a6f',
+        headerBg: '#1b4b5a',
+        headerText: '#f1fbff',
+        accent: '#5ac4b5',
+        accentStrong: '#339d8f',
+        accentContrast: '#072521',
+        cardBg: '#f1f9f6',
+        cardBorder: '#cfe7de',
+        toastBg: '#1b4b5a'
+      },
+      day: {
+        pageBg: '#eaf3fb',
+        surface: '#ffffff',
+        textMain: '#102a43',
+        textMuted: '#48617a',
+        headerBg: '#1f3b57',
+        headerText: '#f1f5ff',
+        accent: '#7cb7ff',
+        accentStrong: '#4a90e2',
+        accentContrast: '#0b1a2c',
+        cardBg: '#f2f7fc',
+        cardBorder: '#d7e4f2',
+        toastBg: '#1f3b57'
+      },
+      golden: {
+        pageBg: '#fff4e5',
+        surface: '#fffaf4',
+        textMain: '#40260a',
+        textMuted: '#7c5530',
+        headerBg: '#8a4b1d',
+        headerText: '#fff8ec',
+        accent: '#f2a65e',
+        accentStrong: '#e9803a',
+        accentContrast: '#1f1206',
+        cardBg: '#fff1e3',
+        cardBorder: '#f3d3b4',
+        toastBg: '#8a4b1d'
+      },
+      evening: {
+        pageBg: '#f3ebff',
+        surface: '#fdfbff',
+        textMain: '#251b33',
+        textMuted: '#5a4d6f',
+        headerBg: '#382a55',
+        headerText: '#f4ecff',
+        accent: '#b28cf6',
+        accentStrong: '#8b6be2',
+        accentContrast: '#150d22',
+        cardBg: '#f2ecff',
+        cardBorder: '#ded3f5',
+        toastBg: '#382a55'
+      },
+      night: {
+        pageBg: '#0d1222',
+        surface: '#131a2b',
+        textMain: '#e4ecf7',
+        textMuted: '#b3c0d6',
+        headerBg: '#0b162a',
+        headerText: '#e4ecf7',
+        accent: '#5ea4ff',
+        accentStrong: '#3b7dd6',
+        accentContrast: '#0b162a',
+        cardBg: '#101829',
+        cardBorder: '#1f2a3c',
+        toastBg: '#0b162a'
+      }
+    };
+
+    const palette = { ...(basePalettes[phase] || basePalettes.day) };
+    const condition = weather.condition || 'clear';
+
+    const blend = (hex1, hex2, t = 0.5) => {
+      const toRGB = (hex) => {
+        const clean = hex.replace('#', '');
+        const full = clean.length === 3 ? clean.split('').map(ch => ch + ch).join('') : clean;
+        const val = parseInt(full || '000000', 16);
+        return {
+          r: (val >> 16) & 255,
+          g: (val >> 8) & 255,
+          b: val & 255
+        };
+      };
+      const a = toRGB(hex1);
+      const b = toRGB(hex2);
+      const r = Math.round(a.r + (b.r - a.r) * t);
+      const g = Math.round(a.g + (b.g - a.g) * t);
+      const bCh = Math.round(a.b + (b.b - a.b) * t);
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bCh.toString(16).padStart(2, '0')}`;
+    };
+
+    const applyDarkness = (factor) => {
+      if (factor <= 0) return;
+      const clamp = Math.min(Math.max(factor, 0), 0.7);
+      palette.pageBg = blend(palette.pageBg, '#0b1222', clamp);
+      palette.surface = blend(palette.surface, '#0f1628', clamp * 0.9);
+      palette.cardBg = blend(palette.cardBg, '#0f182a', clamp * 0.8);
+      palette.cardBorder = blend(palette.cardBorder, '#1f2a3c', clamp * 0.7);
+      palette.headerBg = blend(palette.headerBg, '#0b162a', clamp * 0.9);
+      palette.toastBg = palette.headerBg;
+      palette.textMain = blend(palette.textMain, '#f6f8fb', clamp * 0.6);
+      palette.textMuted = blend(palette.textMuted, '#c7d2e2', clamp * 0.6);
+    };
+
+    if (condition === 'rain' || condition === 'sleet') {
+      palette.accent = blend(palette.accent, '#4ba3f5', 0.55);
+      palette.accentStrong = blend(palette.accentStrong, '#2563eb', 0.6);
+      palette.pageBg = blend(palette.pageBg, '#e6f1fb', 0.5);
+      palette.cardBg = blend(palette.cardBg, '#e9f2fc', 0.5);
+    } else if (condition === 'storm') {
+      palette.accent = blend(palette.accent, '#6366f1', 0.6);
+      palette.accentStrong = blend(palette.accentStrong, '#4338ca', 0.65);
+      palette.headerBg = blend(palette.headerBg, '#111827', 0.6);
+      palette.toastBg = palette.headerBg;
+    } else if (condition === 'snow') {
+      palette.pageBg = blend(palette.pageBg, '#f7fbff', 0.7);
+      palette.surface = blend(palette.surface, '#ffffff', 0.6);
+      palette.cardBg = blend(palette.cardBg, '#f8fbff', 0.65);
+      palette.accent = blend(palette.accent, '#9ccff7', 0.4);
+      palette.textMuted = blend(palette.textMuted, '#5f7186', 0.6);
+    } else if (condition === 'clouds' || condition === 'fog') {
+      palette.accent = blend(palette.accent, '#7da0c9', 0.45);
+      palette.accentStrong = blend(palette.accentStrong, '#4d6b9f', 0.45);
+      palette.cardBg = blend(palette.cardBg, '#eef2f7', 0.5);
+      palette.textMuted = blend(palette.textMuted, '#5b6675', 0.5);
+    }
+
+    // Darken in naturally darker or gloomy situations so Serenity matches the mood
+    let darkness = 0;
+    if (phase === 'night') darkness = 0.6;
+    else if (phase === 'evening') darkness = 0.35;
+    else if (phase === 'golden') darkness = 0.2;
+    else if (phase === 'dawn') darkness = 0.15;
+
+    if (['storm', 'rain', 'sleet', 'snow', 'clouds', 'fog'].includes(condition)) {
+      darkness = Math.min(0.65, darkness + 0.15);
+    }
+
+    applyDarkness(darkness);
+
+    return palette;
+  }
+
+  setSerenityVariables(palette) {
+    const root = document.documentElement;
+    const vars = {
+      '--page-bg': palette.pageBg,
+      '--surface': palette.surface,
+      '--text-main': palette.textMain,
+      '--text-muted': palette.textMuted,
+      '--header-bg': palette.headerBg,
+      '--header-text': palette.headerText,
+      '--accent': palette.accent,
+      '--accent-strong': palette.accentStrong,
+      '--accent-contrast': palette.accentContrast,
+      '--card-bg': palette.cardBg,
+      '--card-border': palette.cardBorder,
+      '--toast-bg': palette.toastBg
+    };
+    Object.entries(vars).forEach(([key, val]) => {
+      root.style.setProperty(key, val);
+    });
+  }
+
+  scheduleSerenityRefresh(now = new Date()) {
+    if (this.serenityRefreshTimer) {
+      clearTimeout(this.serenityRefreshTimer);
+    }
+    const msToNextHour = Math.max(
+      ((60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000 - now.getMilliseconds(),
+      5 * 60 * 1000
+    );
+    const msUntilWeatherRefresh = 25 * 60 * 1000;
+    const delay = Math.min(msToNextHour, msUntilWeatherRefresh);
+    this.serenityRefreshTimer = setTimeout(() => {
+      if (this.currentTheme === 'serenity') {
+        this.applySerenityTheme();
+      }
+    }, delay);
+  }
+
+  clearSerenityOverrides() {
+    if (this.serenityRefreshTimer) {
+      clearTimeout(this.serenityRefreshTimer);
+      this.serenityRefreshTimer = null;
+    }
+    this.serenityWeatherCache = null;
+    const root = document.documentElement;
+    [
+      '--page-bg',
+      '--surface',
+      '--text-main',
+      '--text-muted',
+      '--header-bg',
+      '--header-text',
+      '--accent',
+      '--accent-strong',
+      '--accent-contrast',
+      '--card-bg',
+      '--card-border',
+      '--toast-bg'
+    ].forEach(v => root.style.removeProperty(v));
   }
 
   showRefreshToast(summary) {

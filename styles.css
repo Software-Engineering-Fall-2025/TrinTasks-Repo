@@ -1327,3 +1327,138 @@ body.theme-serenity {
 body.theme-serenity .header {
   background: #7cb7ff;
 }
+
+/* Pin Button */
+.pin-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 2px solid var(--black);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0.5;
+  transition: all 0.1s ease;
+  box-shadow: none;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.pin-btn:hover {
+  opacity: 1;
+  color: var(--black);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pin-btn.pinned {
+  background: var(--accent);
+  color: white;
+  opacity: 1;
+}
+
+.pin-btn.pinned:hover {
+  background: var(--accent-hover);
+  color: white;
+}
+
+.pin-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+/* Sidebar Section Headers */
+.sidebar-section-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 2px dashed var(--black);
+}
+
+.sidebar-section-header:not(:first-child) {
+  margin-top: 16px;
+}
+
+.sidebar-section-header svg {
+  opacity: 0.8;
+}
+
+/* Pinned Item in Sidebar */
+.pinned-item {
+  position: relative;
+  padding-right: 28px;
+}
+
+.unpin-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: all 0.1s ease;
+  box-shadow: none;
+}
+
+.pinned-item:hover .unpin-btn {
+  opacity: 1;
+}
+
+.unpin-btn:hover {
+  color: var(--danger);
+  background: rgba(248, 113, 113, 0.2);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: none;
+}
+
+/* Event Links */
+.event-link {
+  color: var(--accent);
+  text-decoration: underline;
+  word-break: break-all;
+  transition: color 0.1s ease;
+}
+
+.event-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.event-link:visited {
+  color: var(--text-muted);
+}
+
+/* Ensure links in completed events are still visible */
+.event.completed .event-link {
+  color: var(--black);
+  opacity: 0.8;
+}
+
+.event.completed .event-link:hover {
+  opacity: 1;
+}

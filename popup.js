@@ -462,6 +462,7 @@ class UIController {
 
     this.events = [];
     this.subjectTags = {};
+    this.pinnedAssignments = {}; // Track pinned assignments by event ID
     this.currentTheme = 'fern';
     this.serenityWeatherCache = null;
     this.serenityRefreshTimer = null;
@@ -649,6 +650,74 @@ class UIController {
       return;
     }
 
+    this.majorAssignmentsBar.classList.remove('hidden');
+    this.majorListDiv.innerHTML = '';
+
+    // Show pinned assignments first
+    const pinnedIds = Object.keys(this.pinnedAssignments || {});
+    if (pinnedIds.length > 0) {
+      const pinnedHeader = document.createElement('div');
+      pinnedHeader.className = 'sidebar-section-header';
+      pinnedHeader.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg> Pinned';
+      this.majorListDiv.appendChild(pinnedHeader);
+
+      pinnedIds.forEach(eventId => {
+        const pinData = this.pinnedAssignments[eventId];
+        // Find full event if available
+        const ev = (this.events || []).find(e => {
+          const id = e.uid || `${e.title}_${e.dueRaw || e.startRaw}`;
+          return id === eventId;
+        }) || pinData;
+
+        const item = document.createElement('div');
+        item.className = 'major-item pinned-item';
+
+        const title = document.createElement('div');
+        title.className = 'major-title';
+        title.textContent = this.getCleanTitle(ev.title || 'Untitled');
+
+        const meta = document.createElement('div');
+        meta.className = 'major-meta';
+        meta.textContent = ev.dueTime || ev.startTime || '';
+
+        // Unpin button
+        const unpinBtn = document.createElement('button');
+        unpinBtn.type = 'button';
+        unpinBtn.className = 'unpin-btn';
+        unpinBtn.title = 'Unpin';
+        unpinBtn.innerHTML = '&times;';
+        unpinBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          delete this.pinnedAssignments[eventId];
+          await chrome.storage.local.set({ pinnedAssignments: this.pinnedAssignments });
+          this.updateMajorAssignmentsBar();
+          this.showEventsForSelectedDay(); // Refresh to update pin buttons
+        });
+
+        item.appendChild(title);
+        item.appendChild(meta);
+        item.appendChild(unpinBtn);
+
+        // Click to navigate to date
+        item.addEventListener('click', () => {
+          const raw = ev.dueRaw || ev.startRaw;
+          if (raw) {
+            const datePart = (raw.split('T')[0] || raw).replace(/\D/g, '').substring(0, 8);
+            if (datePart.length === 8) {
+              const y = parseInt(datePart.substring(0, 4), 10);
+              const m = parseInt(datePart.substring(4, 6), 10) - 1;
+              const d = parseInt(datePart.substring(6, 8), 10);
+              this.selectedDate = new Date(y, m, d);
+              this.renderWeekView();
+              this.showEventsForSelectedDay();
+            }
+          }
+        });
+
+        this.majorListDiv.appendChild(item);
+      });
+    }
+
     // Build list of major assignments that fall within the next 14 days, sorted by due date ascending
     const now = Date.now();
     const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
@@ -663,46 +732,55 @@ class UIController {
       return ta - tb;
     });
 
-    this.majorListDiv.innerHTML = '';
-    if (majors.length === 0) {
+    // Add major assignments section if there are any
+    if (majors.length > 0) {
+      if (pinnedIds.length > 0) {
+        const majorHeader = document.createElement('div');
+        majorHeader.className = 'sidebar-section-header';
+        majorHeader.textContent = 'Major';
+        this.majorListDiv.appendChild(majorHeader);
+      }
+
+      majors.forEach(ev => {
+        const item = document.createElement('div');
+        item.className = 'major-item';
+        const title = document.createElement('div');
+        title.className = 'major-title';
+        title.textContent = this.getCleanTitle(ev.title || ev.summary || 'Untitled');
+        const meta = document.createElement('div');
+        meta.className = 'major-meta';
+        const when = ev.dueTime || ev.startTime || '';
+        meta.textContent = when;
+        item.appendChild(title);
+        item.appendChild(meta);
+        // clicking focuses the date/day in the main view
+        item.addEventListener('click', () => {
+          if (ev.dueRaw || ev.startRaw) {
+            const raw = ev.dueRaw || ev.startRaw;
+            const datePart = (raw.split('T')[0] || raw).replace(/\D/g, '').substring(0, 8);
+            if (datePart.length === 8) {
+              const y = parseInt(datePart.substring(0, 4), 10);
+              const m = parseInt(datePart.substring(4, 6), 10) - 1;
+              const d = parseInt(datePart.substring(6, 8), 10);
+              this.selectedDate = new Date(y, m, d);
+              this.renderWeekView();
+              this.showEventsForSelectedDay();
+            }
+          }
+        });
+        this.majorListDiv.appendChild(item);
+      });
+    }
+
+    // Show empty message if nothing to display
+    if (pinnedIds.length === 0 && majors.length === 0) {
       const p = document.createElement('div');
       p.className = 'major-empty';
       p.style.color = 'var(--text-muted)';
       p.style.fontSize = '13px';
-      p.textContent = 'No major assignments found';
+      p.textContent = 'No pinned or major assignments';
       this.majorListDiv.appendChild(p);
-      return;
     }
-
-    majors.forEach(ev => {
-      const item = document.createElement('div');
-      item.className = 'major-item';
-      const title = document.createElement('div');
-      title.className = 'major-title';
-      title.textContent = this.getCleanTitle(ev.title || ev.summary || 'Untitled');
-      const meta = document.createElement('div');
-      meta.className = 'major-meta';
-      const when = ev.dueTime || ev.startTime || '';
-      meta.textContent = when;
-      item.appendChild(title);
-      item.appendChild(meta);
-      // clicking focuses the date/day in the main view
-      item.addEventListener('click', () => {
-        if (ev.dueRaw || ev.startRaw) {
-          const raw = ev.dueRaw || ev.startRaw;
-          const datePart = (raw.split('T')[0] || raw).replace(/\D/g, '').substring(0,8);
-          if (datePart.length === 8) {
-            const y = parseInt(datePart.substring(0,4),10);
-            const m = parseInt(datePart.substring(4,6),10)-1;
-            const d = parseInt(datePart.substring(6,8),10);
-            this.selectedDate = new Date(y,m,d);
-            this.renderWeekView();
-            this.showEventsForSelectedDay();
-          }
-        }
-      });
-      this.majorListDiv.appendChild(item);
-    });
   }
 
   createEventElement(event) {
@@ -741,6 +819,24 @@ class UIController {
       checkbox.checked = event.isCompleted || false;
       checkbox.addEventListener('change', () => this.toggleAssignmentComplete(event, eventDiv));
       headerDiv.appendChild(checkbox);
+    }
+
+    // Add pin button (only visible when sidebar is enabled)
+    const sidebarEnabled = this.showMajorAssignmentsCheckbox && this.showMajorAssignmentsCheckbox.checked;
+    if (sidebarEnabled) {
+      const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+      const isPinned = !!this.pinnedAssignments[eventId];
+
+      const pinBtn = document.createElement('button');
+      pinBtn.type = 'button';
+      pinBtn.className = 'pin-btn' + (isPinned ? ' pinned' : '');
+      pinBtn.title = isPinned ? 'Unpin from sidebar' : 'Pin to sidebar';
+      pinBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>';
+      pinBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.togglePinAssignment(event, pinBtn);
+      });
+      headerDiv.appendChild(pinBtn);
     }
 
     const titleDiv = document.createElement('div');
@@ -830,7 +926,7 @@ class UIController {
     html += '</div>';
 
     if (event.description) {
-      html += `<div class="event-description">${this.escapeHtml(event.description)}</div>`;
+      html += `<div class="event-description">${this.linkifyText(event.description)}</div>`;
     }
 
     // Add the details HTML to the eventDiv
@@ -850,6 +946,32 @@ class UIController {
       "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  /**
+   * Convert URLs in text to clickable links
+   * @param {string} text - The text to process
+   * @returns {string} Text with URLs converted to anchor tags
+   */
+  linkifyText(text) {
+    if (!text) return '';
+    // First escape HTML
+    const escaped = this.escapeHtml(text);
+    // URL regex pattern - matches http(s), www, and common domains
+    const urlPattern = /(\bhttps?:\/\/[^\s<>"{}|\\^`[\]]+|\bwww\.[^\s<>"{}|\\^`[\]]+)/gi;
+    return escaped.replace(urlPattern, (url) => {
+      let href = url;
+      // Add protocol if missing (for www. links)
+      if (url.toLowerCase().startsWith('www.')) {
+        href = 'https://' + url;
+      }
+      // Truncate display text if too long
+      let displayUrl = url;
+      if (displayUrl.length > 50) {
+        displayUrl = displayUrl.substring(0, 47) + '...';
+      }
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="event-link">${displayUrl}</a>`;
+    });
   }
 
   showLoading(show) {
@@ -1092,6 +1214,43 @@ class UIController {
     }
   }
 
+  async togglePinAssignment(event, pinBtn) {
+    const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+
+    // Load existing pinned assignments
+    const data = await chrome.storage.local.get(['pinnedAssignments']);
+    const pinnedAssignments = data.pinnedAssignments || {};
+
+    if (pinnedAssignments[eventId]) {
+      // Unpin
+      delete pinnedAssignments[eventId];
+      this.pinnedAssignments = pinnedAssignments;
+      if (pinBtn) {
+        pinBtn.classList.remove('pinned');
+        pinBtn.title = 'Pin to sidebar';
+      }
+    } else {
+      // Pin
+      pinnedAssignments[eventId] = {
+        title: event.title,
+        dueRaw: event.dueRaw,
+        startRaw: event.startRaw,
+        dueTime: event.dueTime,
+        startTime: event.startTime,
+        pinnedDate: new Date().toISOString()
+      };
+      this.pinnedAssignments = pinnedAssignments;
+      if (pinBtn) {
+        pinBtn.classList.add('pinned');
+        pinBtn.title = 'Unpin from sidebar';
+      }
+    }
+
+    await chrome.storage.local.set({ pinnedAssignments });
+    // Refresh sidebar
+    this.updateMajorAssignmentsBar();
+  }
+
   async toggleAssignmentComplete(event, eventElement) {
     const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
 
@@ -1137,7 +1296,10 @@ class UIController {
 
   async loadSavedData() {
     try {
-      const data = await chrome.storage.local.get(['icalUrl', 'events', 'completedAssignments', 'lastRefreshSummary']);
+      const data = await chrome.storage.local.get(['icalUrl', 'events', 'completedAssignments', 'lastRefreshSummary', 'pinnedAssignments']);
+
+      // Load pinned assignments
+      this.pinnedAssignments = data.pinnedAssignments || {};
 
       if (data.icalUrl && data.events) {
         this.icalLinkInput.value = data.icalUrl;

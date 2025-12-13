@@ -107,8 +107,8 @@ export class EventRenderer {
     if (event.dueTime) {
       const isOverdue = !event.isCompleted && event.dueRaw &&
                        ICalParser.iCalDateToTimestamp(event.dueRaw) < Date.now();
-      const dueStyle = isOverdue ? 'color: #dc2626; font-weight: 700;' : 'color: #dc2626; font-weight: 600;';
-      const dueLabel = isOverdue ? '⚠️ OVERDUE:' : 'Due:';
+      const dueStyle = isOverdue ? 'color: #f59e0b; font-weight: 600;' : 'color: var(--text); font-weight: 600;';
+      const dueLabel = isOverdue ? 'Past due:' : 'Due:';
 
       html += `<div class="event-detail">
         <span class="event-detail-label">${dueLabel}</span>

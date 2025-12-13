@@ -79,7 +79,7 @@ export class UIController {
     this.subjectTags = {};
     this.pinnedAssignments = {};
     this.isSettingsView = false;
-    this.filterMode = 'all';
+    this.filterMode = 'active'; // Default to showing uncompleted
     this.autoRefreshInterval = null;
     this.isAnimating = false; // Prevent re-render during animations
 

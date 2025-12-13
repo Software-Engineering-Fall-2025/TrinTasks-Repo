@@ -313,3 +313,26 @@ export async function saveSettings(settings) {
 export async function saveSubjectTags(subjectTags) {
   await chrome.storage.local.set({ subjectTags });
 }
+
+/**
+ * Save custom event order for a specific date
+ * @param {string} dateKey - Date key in YYYYMMDD format
+ * @param {Array} eventIds - Ordered array of event IDs
+ */
+export async function saveEventOrder(dateKey, eventIds) {
+  const data = await chrome.storage.local.get(['eventOrder']);
+  const eventOrder = data.eventOrder || {};
+  eventOrder[dateKey] = eventIds;
+  await chrome.storage.local.set({ eventOrder });
+}
+
+/**
+ * Load custom event order for a specific date
+ * @param {string} dateKey - Date key in YYYYMMDD format
+ * @returns {Promise<Array|null>} Ordered array of event IDs or null
+ */
+export async function loadEventOrder(dateKey) {
+  const data = await chrome.storage.local.get(['eventOrder']);
+  const eventOrder = data.eventOrder || {};
+  return eventOrder[dateKey] || null;
+}

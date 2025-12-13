@@ -778,6 +778,16 @@ button:active {
   box-shadow: var(--shadow-hover);
 }
 
+.event[draggable="true"] {
+  cursor: grab;
+}
+
+.event.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
 .event.completed {
   background: var(--success);
   border-color: var(--black);
@@ -1424,6 +1434,8 @@ body.theme-midnight .refresh-toast {
 }
 
 /* Theme Variations */
+
+/* Fern Theme - Green nature palette */
 body.theme-fern {
   --accent: #2f855a;
   --accent-hover: #276749;
@@ -1433,6 +1445,39 @@ body.theme-fern .header {
   background: #2f855a;
 }
 
+body.theme-fern .week-view {
+  background: #c6f6d5;
+}
+
+body.theme-fern .events-list-header {
+  background: #9ae6b4;
+}
+
+body.theme-fern .major-assignments-bar {
+  background: #c6f6d5;
+}
+
+body.theme-fern .week-day-events {
+  background: #68d391;
+}
+
+body.theme-fern .settings-section:nth-child(1) {
+  background: #c6f6d5;
+}
+
+body.theme-fern .settings-section:nth-child(2) {
+  background: #9ae6b4;
+}
+
+body.theme-fern .settings-section:nth-child(3) {
+  background: #68d391;
+}
+
+body.theme-fern .settings-section:nth-child(4) {
+  background: #48bb78;
+}
+
+/* Ocean Theme - Blue water palette */
 body.theme-ocean {
   --accent: #0ea5e9;
   --accent-hover: #0284c7;
@@ -1442,6 +1487,39 @@ body.theme-ocean .header {
   background: #0ea5e9;
 }
 
+body.theme-ocean .week-view {
+  background: #bae6fd;
+}
+
+body.theme-ocean .events-list-header {
+  background: #7dd3fc;
+}
+
+body.theme-ocean .major-assignments-bar {
+  background: #bae6fd;
+}
+
+body.theme-ocean .week-day-events {
+  background: #38bdf8;
+}
+
+body.theme-ocean .settings-section:nth-child(1) {
+  background: #bae6fd;
+}
+
+body.theme-ocean .settings-section:nth-child(2) {
+  background: #7dd3fc;
+}
+
+body.theme-ocean .settings-section:nth-child(3) {
+  background: #38bdf8;
+}
+
+body.theme-ocean .settings-section:nth-child(4) {
+  background: #0ea5e9;
+}
+
+/* Sunset Theme - Warm orange palette */
 body.theme-sunset {
   --accent: #f97316;
   --accent-hover: #ea580c;
@@ -1451,6 +1529,39 @@ body.theme-sunset .header {
   background: #f97316;
 }
 
+body.theme-sunset .week-view {
+  background: #fed7aa;
+}
+
+body.theme-sunset .events-list-header {
+  background: #fdba74;
+}
+
+body.theme-sunset .major-assignments-bar {
+  background: #fed7aa;
+}
+
+body.theme-sunset .week-day-events {
+  background: #fb923c;
+}
+
+body.theme-sunset .settings-section:nth-child(1) {
+  background: #fed7aa;
+}
+
+body.theme-sunset .settings-section:nth-child(2) {
+  background: #fdba74;
+}
+
+body.theme-sunset .settings-section:nth-child(3) {
+  background: #fb923c;
+}
+
+body.theme-sunset .settings-section:nth-child(4) {
+  background: #f97316;
+}
+
+/* Slate Theme - Cool gray palette */
 body.theme-slate {
   --accent: #64748b;
   --accent-hover: #475569;
@@ -1460,12 +1571,77 @@ body.theme-slate .header {
   background: #64748b;
 }
 
+body.theme-slate .week-view {
+  background: #e2e8f0;
+}
+
+body.theme-slate .events-list-header {
+  background: #cbd5e1;
+}
+
+body.theme-slate .major-assignments-bar {
+  background: #e2e8f0;
+}
+
+body.theme-slate .week-day-events {
+  background: #94a3b8;
+}
+
+body.theme-slate .settings-section:nth-child(1) {
+  background: #e2e8f0;
+}
+
+body.theme-slate .settings-section:nth-child(2) {
+  background: #cbd5e1;
+}
+
+body.theme-slate .settings-section:nth-child(3) {
+  background: #94a3b8;
+}
+
+body.theme-slate .settings-section:nth-child(4) {
+  background: #64748b;
+}
+
+/* Orchid Theme - Purple palette */
 body.theme-orchid {
   --accent: #a855f7;
   --accent-hover: #9333ea;
 }
 
 body.theme-orchid .header {
+  background: #a855f7;
+}
+
+body.theme-orchid .week-view {
+  background: #e9d5ff;
+}
+
+body.theme-orchid .events-list-header {
+  background: #d8b4fe;
+}
+
+body.theme-orchid .major-assignments-bar {
+  background: #e9d5ff;
+}
+
+body.theme-orchid .week-day-events {
+  background: #c084fc;
+}
+
+body.theme-orchid .settings-section:nth-child(1) {
+  background: #e9d5ff;
+}
+
+body.theme-orchid .settings-section:nth-child(2) {
+  background: #d8b4fe;
+}
+
+body.theme-orchid .settings-section:nth-child(3) {
+  background: #c084fc;
+}
+
+body.theme-orchid .settings-section:nth-child(4) {
   background: #a855f7;
 }
 
@@ -1690,6 +1866,7 @@ body.theme-midnight .event.completing {
   border-color: #fbbf24;
 }
 
+/* Serenity Theme - Calm sky blue palette */
 body.theme-serenity {
   --accent: #7cb7ff;
   --accent-hover: #4a90e2;
@@ -1697,6 +1874,38 @@ body.theme-serenity {
 
 body.theme-serenity .header {
   background: #7cb7ff;
+}
+
+body.theme-serenity .week-view {
+  background: #dbeafe;
+}
+
+body.theme-serenity .events-list-header {
+  background: #bfdbfe;
+}
+
+body.theme-serenity .major-assignments-bar {
+  background: #dbeafe;
+}
+
+body.theme-serenity .week-day-events {
+  background: #93c5fd;
+}
+
+body.theme-serenity .settings-section:nth-child(1) {
+  background: #dbeafe;
+}
+
+body.theme-serenity .settings-section:nth-child(2) {
+  background: #bfdbfe;
+}
+
+body.theme-serenity .settings-section:nth-child(3) {
+  background: #93c5fd;
+}
+
+body.theme-serenity .settings-section:nth-child(4) {
+  background: #60a5fa;
 }
 
 /* Pin Button */

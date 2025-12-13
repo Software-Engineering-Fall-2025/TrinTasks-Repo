@@ -3,6 +3,7 @@
 import { DAY_NAMES, MONTH_NAMES } from './constants.js';
 import { getWeekStart } from './utils.js';
 import { ICalParser } from './ical-parser.js';
+import { saveEventOrder, loadEventOrder } from './storage-manager.js';
 
 export class WeekView {
   constructor(options = {}) {
@@ -12,7 +13,7 @@ export class WeekView {
     this.eventsContainer = options.eventsContainer;
     this.onDaySelect = options.onDaySelect || (() => {});
     this.getEventsForDate = options.getEventsForDate || (() => []);
-    this.filterMode = 'all';
+    this.filterMode = 'active'; // Default to showing uncompleted assignments
 
     this.currentWeekStart = getWeekStart(new Date());
     this.selectedDate = new Date();
@@ -133,10 +134,31 @@ export class WeekView {
   }
 
   /**
+   * Get date key for storage
+   * @param {Date} date - Date object
+   * @returns {string} Date key in YYYYMMDD format
+   */
+  getDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+  }
+
+  /**
+   * Get event ID
+   * @param {Object} event - Event object
+   * @returns {string} Event ID
+   */
+  getEventId(event) {
+    return event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  }
+
+  /**
    * Show events for the selected day
    * @param {Function} createEventElement - Function to create event elements
    */
-  showEventsForSelectedDay(createEventElement) {
+  async showEventsForSelectedDay(createEventElement) {
     let eventsForDay = this.getEventsForDate(this.selectedDate);
     eventsForDay = this.applyFilter(eventsForDay);
 
@@ -162,20 +184,126 @@ export class WeekView {
       noEventsMsg.textContent = 'No assignments for this day';
       this.eventsContainer.appendChild(noEventsMsg);
     } else {
-      // Sort by completion status (incomplete first), then by due/start time
-      eventsForDay.sort((a, b) => {
-        if (a.isCompleted && !b.isCompleted) return 1;
-        if (!a.isCompleted && b.isCompleted) return -1;
-        const ta = ICalParser.iCalDateToTimestamp(a.dueRaw || a.startRaw);
-        const tb = ICalParser.iCalDateToTimestamp(b.dueRaw || b.startRaw);
-        return ta - tb;
-      });
+      // Check for custom order
+      const dateKey = this.getDateKey(this.selectedDate);
+      const customOrder = await loadEventOrder(dateKey);
+
+      if (customOrder && customOrder.length > 0) {
+        // Apply custom order
+        const eventMap = new Map();
+        eventsForDay.forEach(e => eventMap.set(this.getEventId(e), e));
+
+        const orderedEvents = [];
+        // First add events in custom order
+        customOrder.forEach(id => {
+          if (eventMap.has(id)) {
+            orderedEvents.push(eventMap.get(id));
+            eventMap.delete(id);
+          }
+        });
+        // Then add any new events not in custom order
+        eventMap.forEach(e => orderedEvents.push(e));
+        eventsForDay = orderedEvents;
+      } else {
+        // Default sort: incomplete first, then by due time
+        eventsForDay.sort((a, b) => {
+          if (a.isCompleted && !b.isCompleted) return 1;
+          if (!a.isCompleted && b.isCompleted) return -1;
+          const ta = ICalParser.iCalDateToTimestamp(a.dueRaw || a.startRaw);
+          const tb = ICalParser.iCalDateToTimestamp(b.dueRaw || b.startRaw);
+          return ta - tb;
+        });
+      }
 
       eventsForDay.forEach(event => {
         const eventElement = createEventElement(event);
+        const eventId = this.getEventId(event);
+        eventElement.setAttribute('data-event-id', eventId);
+        eventElement.draggable = true;
+        this.setupDragHandlers(eventElement, dateKey);
         this.eventsContainer.appendChild(eventElement);
       });
     }
+  }
+
+  /**
+   * Setup drag and drop handlers for an event element
+   * @param {HTMLElement} element - Event element
+   * @param {string} dateKey - Date key for storage
+   */
+  setupDragHandlers(element, dateKey) {
+    element.addEventListener('dragstart', (e) => {
+      element.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', element.getAttribute('data-event-id'));
+      this.startAutoScroll();
+    });
+
+    element.addEventListener('dragend', () => {
+      element.classList.remove('dragging');
+      this.stopAutoScroll();
+      this.saveCurrentOrder(dateKey);
+    });
+
+    element.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const dragging = this.eventsContainer.querySelector('.dragging');
+      if (!dragging || dragging === element) return;
+
+      const rect = element.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+
+      if (e.clientY < midY) {
+        element.parentNode.insertBefore(dragging, element);
+      } else {
+        element.parentNode.insertBefore(dragging, element.nextSibling);
+      }
+    });
+  }
+
+  /**
+   * Start auto-scroll during drag
+   */
+  startAutoScroll() {
+    const scrollSpeed = 8;
+    const edgeThreshold = 50;
+
+    this.autoScrollHandler = (e) => {
+      const containerRect = this.eventsContainer.getBoundingClientRect();
+      const mouseY = e.clientY;
+
+      // Check if near top edge
+      if (mouseY < containerRect.top + edgeThreshold && mouseY > containerRect.top) {
+        this.eventsContainer.scrollTop -= scrollSpeed;
+      }
+      // Check if near bottom edge
+      else if (mouseY > containerRect.bottom - edgeThreshold && mouseY < containerRect.bottom) {
+        this.eventsContainer.scrollTop += scrollSpeed;
+      }
+    };
+
+    document.addEventListener('dragover', this.autoScrollHandler);
+  }
+
+  /**
+   * Stop auto-scroll
+   */
+  stopAutoScroll() {
+    if (this.autoScrollHandler) {
+      document.removeEventListener('dragover', this.autoScrollHandler);
+      this.autoScrollHandler = null;
+    }
+  }
+
+  /**
+   * Save current order of events
+   * @param {string} dateKey - Date key for storage
+   */
+  async saveCurrentOrder(dateKey) {
+    const eventElements = this.eventsContainer.querySelectorAll('.event[data-event-id]');
+    const eventIds = Array.from(eventElements).map(el => el.getAttribute('data-event-id'));
+    await saveEventOrder(dateKey, eventIds);
   }
 
   /**

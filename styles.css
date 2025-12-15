@@ -913,6 +913,12 @@ button:active {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
+  position: relative;
+}
+
+.week-header .today-btn {
+  position: absolute;
+  right: 44px;
 }
 
 .week-header h2 {

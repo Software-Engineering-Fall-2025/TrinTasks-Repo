@@ -74,7 +74,6 @@ export class UIController {
     this.weekAssignmentsView = document.getElementById('weekAssignmentsView');
     this.weekAssignmentsContainer = document.getElementById('weekAssignmentsContainer');
     this.weekAssignmentsTitle = document.getElementById('weekAssignmentsTitle');
-    this.dayViewBtn = document.getElementById('dayViewBtn');
 
     // View elements
     this.mainView = document.getElementById('mainView');
@@ -207,9 +206,6 @@ export class UIController {
           this.showWeekAssignmentsView();
         }
       });
-    }
-    if (this.dayViewBtn) {
-      this.dayViewBtn.addEventListener('click', () => this.showDayView());
     }
 
     // Custom assignment handlers
@@ -448,6 +444,10 @@ export class UIController {
     if (this.eventsList) {
       this.eventsList.classList.add('hidden');
     }
+    // Hide the week calendar at the top
+    if (this.weekView) {
+      this.weekView.classList.add('hidden');
+    }
     // Show week assignments view
     if (this.weekAssignmentsView) {
       this.weekAssignmentsView.classList.remove('hidden');
@@ -467,6 +467,10 @@ export class UIController {
     // Show day view elements
     if (this.eventsList) {
       this.eventsList.classList.remove('hidden');
+    }
+    // Show the week calendar at the top
+    if (this.weekView) {
+      this.weekView.classList.remove('hidden');
     }
     // Hide week assignments view
     if (this.weekAssignmentsView) {
@@ -929,8 +933,13 @@ export class UIController {
   }
 
   listenForStorageChanges() {
-    listenForStorageChanges(async (changes, areaName) => {
-      if (areaName !== 'local') return;
+    // Debounce storage updates to prevent excessive re-renders
+    let pendingChanges = {};
+    let debounceTimer = null;
+
+    const processChanges = async () => {
+      const changes = pendingChanges;
+      pendingChanges = {};
 
       // Don't re-render during completion animation
       if (this.isAnimating) return;
@@ -953,6 +962,22 @@ export class UIController {
         this.themeManager.applyUIStyle(changes.uiStyle.newValue);
         this.updateUIStyleSelection();
       }
+    };
+
+    listenForStorageChanges((changes, areaName) => {
+      if (areaName !== 'local') return;
+
+      // Accumulate changes
+      Object.assign(pendingChanges, changes);
+
+      // Debounce: wait 200ms for more changes before processing
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+      debounceTimer = setTimeout(() => {
+        debounceTimer = null;
+        processChanges();
+      }, 200);
     });
   }
 
@@ -1226,7 +1251,27 @@ export class UIController {
   async loadSubjectTags() {
     const data = await chrome.storage.local.get(['subjectTags']);
     this.subjectTags = data.subjectTags || {};
+    // Migrate old format (string color) to new format (object with color and displayName)
+    this.migrateSubjectTagsFormat();
     this.displaySubjectTags();
+  }
+
+  // Migrate from old format { "MATH": "#color" } to new format { "MATH": { color: "#color", displayName: "MATH" } }
+  migrateSubjectTagsFormat() {
+    let needsSave = false;
+    for (const key in this.subjectTags) {
+      if (typeof this.subjectTags[key] === 'string') {
+        // Old format - migrate to new
+        this.subjectTags[key] = {
+          color: this.subjectTags[key],
+          displayName: key
+        };
+        needsSave = true;
+      }
+    }
+    if (needsSave) {
+      saveSubjectTags(this.subjectTags);
+    }
   }
 
   displaySubjectTags() {
@@ -1241,7 +1286,10 @@ export class UIController {
       return;
     }
 
-    tags.forEach(([name, color]) => {
+    tags.forEach(([originalName, tagData]) => {
+      const color = tagData.color || tagData; // Handle both old and new format
+      const displayName = tagData.displayName || originalName;
+
       const tagDiv = document.createElement('div');
       tagDiv.className = 'subject-tag-item';
 
@@ -1251,12 +1299,12 @@ export class UIController {
       colorInput.className = 'tag-color-input';
       colorInput.title = 'Click to change color';
       colorInput.addEventListener('input', (e) => {
-        this.updateSubjectTagColor(name, e.target.value);
+        this.updateSubjectTagColor(originalName, e.target.value);
       });
 
       const tagName = document.createElement('span');
       tagName.className = 'tag-name';
-      tagName.textContent = name;
+      tagName.textContent = displayName;
 
       tagDiv.appendChild(colorInput);
       tagDiv.appendChild(tagName);
@@ -1264,9 +1312,16 @@ export class UIController {
     });
   }
 
-  async updateSubjectTagColor(name, color) {
-    this.subjectTags[name] = color;
-    await saveSubjectTags(this.subjectTags);
+  async updateSubjectTagColor(originalName, color) {
+    if (this.subjectTags[originalName]) {
+      if (typeof this.subjectTags[originalName] === 'object') {
+        this.subjectTags[originalName].color = color;
+      } else {
+        // Migrate old format
+        this.subjectTags[originalName] = { color, displayName: originalName };
+      }
+      await saveSubjectTags(this.subjectTags);
+    }
   }
 
   getSubjectFromTitle(title) {
@@ -1275,14 +1330,19 @@ export class UIController {
       let subject = subjectMatch[1].trim();
       subject = subject.replace(/\s+\d+$/, '');
 
-      for (const tag in this.subjectTags) {
-        if (subject.includes(tag) || tag.includes(subject)) {
-          return { name: tag, color: this.subjectTags[tag] };
+      // Check if extracted subject matches any existing tag (by original key)
+      for (const originalKey in this.subjectTags) {
+        if (subject.includes(originalKey) || originalKey.includes(subject)) {
+          const tagData = this.subjectTags[originalKey];
+          const color = typeof tagData === 'object' ? tagData.color : tagData;
+          const displayName = typeof tagData === 'object' ? tagData.displayName : originalKey;
+          return { name: displayName, color: color };
         }
       }
 
+      // No match found - create new tag with extracted subject as both key and displayName
       const color = this.getDefaultColorForSubject(subject);
-      this.subjectTags[subject] = color;
+      this.subjectTags[subject] = { color, displayName: subject };
       saveSubjectTags(this.subjectTags);
       return { name: subject, color: color };
     }

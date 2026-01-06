@@ -1,6 +1,7 @@
 // Storage Manager - Handles Chrome local storage operations
 
 import { ICalParser } from './ical-parser.js';
+import { getEventId } from './utils.js';
 
 /**
  * Save events to Chrome storage
@@ -15,7 +16,7 @@ export async function saveToStorage(url, events) {
 
     // Merge completion status with events
     events = events.map(event => {
-      const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+      const eventId = getEventId(event);
       if (completedAssignments[eventId]) {
         event.isCompleted = true;
         event.completedDate = completedAssignments[eventId].completedDate;
@@ -80,7 +81,7 @@ export function mergeCompletionStatus(events, completedAssignments, inProgressAs
   const inProgress = inProgressAssignments || {};
   return (events || []).map(event => {
     const merged = { ...event };
-    const eventId = merged.uid || `${merged.title}_${merged.dueRaw || merged.startRaw}`;
+    const eventId = getEventId(merged);
     if (completed[eventId]) {
       merged.isCompleted = true;
       merged.completedDate = completed[eventId].completedDate;
@@ -107,7 +108,7 @@ export function mergeCompletionStatus(events, completedAssignments, inProgressAs
  * @returns {Promise<{pinnedAssignments: Object, isPinned: boolean}>}
  */
 export async function togglePinAssignment(event, currentPinned) {
-  const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  const eventId = getEventId(event);
 
   // Load existing pinned assignments
   const data = await chrome.storage.local.get(['pinnedAssignments']);
@@ -141,7 +142,7 @@ export async function togglePinAssignment(event, currentPinned) {
  * @returns {Promise<{isCompleted: boolean, completedDate: string|null, isInProgress: boolean}>}
  */
 export async function toggleAssignmentComplete(event) {
-  const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  const eventId = getEventId(event);
 
   // Load existing assignments
   const data = await chrome.storage.local.get(['completedAssignments', 'inProgressAssignments']);
@@ -176,7 +177,7 @@ export async function toggleAssignmentComplete(event) {
  * @returns {Promise<{isInProgress: boolean, inProgressDate: string|null}>}
  */
 export async function toggleAssignmentInProgress(event) {
-  const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  const eventId = getEventId(event);
 
   // Load existing in-progress assignments
   const data = await chrome.storage.local.get(['inProgressAssignments', 'completedAssignments']);
@@ -213,6 +214,22 @@ export function listenForStorageChanges(callback) {
   chrome.storage.onChanged.addListener(callback);
 }
 
+// Fields to compare for detecting event changes (excludes status fields)
+const EVENT_COMPARE_FIELDS = ['title', 'dueRaw', 'startRaw', 'endRaw', 'description', 'location', 'dueTime', 'startTime'];
+
+/**
+ * Check if two events have meaningful differences (ignoring status fields)
+ * @param {Object} prev - Previous event
+ * @param {Object} curr - Current event
+ * @returns {boolean} True if events differ
+ */
+function hasEventChanged(prev, curr) {
+  for (const field of EVENT_COMPARE_FIELDS) {
+    if (prev[field] !== curr[field]) return true;
+  }
+  return false;
+}
+
 /**
  * Refresh calendar data locally (fallback when background refresh fails)
  * @param {string} url - The iCal URL
@@ -225,46 +242,44 @@ export async function refreshLocally(url) {
 
   const newEvents = await ICalParser.fetchAndParse(url);
 
+  // Build map of previous events by ID
   const prevMap = new Map();
-  previousEvents.forEach(ev => {
-    const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
-    prevMap.set(id, ev);
-  });
+  previousEvents.forEach(ev => prevMap.set(getEventId(ev), ev));
 
+  // Process new events and track changes
   const nextEvents = [];
+  const nextIds = new Set();
   let added = 0;
   let updated = 0;
 
-  newEvents.forEach(ev => {
-    const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
+  for (const ev of newEvents) {
+    const id = getEventId(ev);
+    nextIds.add(id);
+
     const prev = prevMap.get(id);
     if (!prev) {
       added++;
-    } else {
-      const prevClone = { ...prev };
-      delete prevClone.isCompleted;
-      delete prevClone.completedDate;
-      const currClone = { ...ev };
-      if (JSON.stringify(prevClone) !== JSON.stringify(currClone)) {
-        updated++;
-      }
+    } else if (hasEventChanged(prev, ev)) {
+      updated++;
     }
+
+    // Preserve completion status
     if (completedAssignments[id]) {
       ev.isCompleted = true;
       ev.completedDate = completedAssignments[id].completedDate;
     }
     nextEvents.push(ev);
-  });
+  }
 
-  const nextIds = new Set(nextEvents.map(ev => ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`));
+  // Count removed events and clean up completion status
   let removed = 0;
-  previousEvents.forEach(ev => {
-    const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
+  for (const ev of previousEvents) {
+    const id = getEventId(ev);
     if (!nextIds.has(id)) {
       removed++;
       delete completedAssignments[id];
     }
-  });
+  }
 
   await chrome.storage.local.set({
     events: nextEvents,
@@ -415,7 +430,7 @@ export async function loadEventOrder(dateKey) {
  * @returns {Promise<{success: boolean, reminderTime: number}>}
  */
 export async function setAssignmentReminder(event, hours) {
-  const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  const eventId = getEventId(event);
   const reminderTime = Date.now() + (hours * 60 * 60 * 1000);
 
   // Load existing assignment reminders
@@ -448,7 +463,7 @@ export async function setAssignmentReminder(event, hours) {
  * @returns {Promise<{success: boolean}>}
  */
 export async function clearAssignmentReminder(event) {
-  const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  const eventId = getEventId(event);
 
   // Load existing assignment reminders
   const data = await chrome.storage.local.get(['assignmentReminders']);
@@ -480,7 +495,7 @@ export async function getAssignmentReminders() {
  * @returns {Promise<{hasReminder: boolean, reminderTime: number|null, hours: number|null}>}
  */
 export async function getAssignmentReminderStatus(event) {
-  const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+  const eventId = getEventId(event);
   const data = await chrome.storage.local.get(['assignmentReminders']);
   const assignmentReminders = data.assignmentReminders || {};
 

@@ -1,7 +1,7 @@
 // Week View - Handles calendar week view rendering and navigation
 
 import { DAY_NAMES, MONTH_NAMES } from './constants.js';
-import { getWeekStart } from './utils.js';
+import { getWeekStart, getEventId } from './utils.js';
 import { ICalParser } from './ical-parser.js';
 import { saveEventOrder, loadEventOrder } from './storage-manager.js';
 
@@ -171,12 +171,12 @@ export class WeekView {
   }
 
   /**
-   * Get event ID
+   * Get event ID (uses shared utility)
    * @param {Object} event - Event object
    * @returns {string} Event ID
    */
   getEventId(event) {
-    return event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+    return getEventId(event);
   }
 
   /**
@@ -293,22 +293,38 @@ export class WeekView {
   startAutoScroll() {
     const scrollSpeed = 8;
     const edgeThreshold = 50;
+    let lastMouseY = 0;
+    let rafId = null;
 
-    this.autoScrollHandler = (e) => {
-      const containerRect = this.eventsContainer.getBoundingClientRect();
-      const mouseY = e.clientY;
+    // Cache container rect - only update when scrolling
+    let containerRect = this.eventsContainer.getBoundingClientRect();
 
+    const scrollLoop = () => {
       // Check if near top edge
-      if (mouseY < containerRect.top + edgeThreshold && mouseY > containerRect.top) {
+      if (lastMouseY < containerRect.top + edgeThreshold && lastMouseY > containerRect.top) {
         this.eventsContainer.scrollTop -= scrollSpeed;
+        // Update rect after scroll
+        containerRect = this.eventsContainer.getBoundingClientRect();
       }
       // Check if near bottom edge
-      else if (mouseY > containerRect.bottom - edgeThreshold && mouseY < containerRect.bottom) {
+      else if (lastMouseY > containerRect.bottom - edgeThreshold && lastMouseY < containerRect.bottom) {
         this.eventsContainer.scrollTop += scrollSpeed;
+        // Update rect after scroll
+        containerRect = this.eventsContainer.getBoundingClientRect();
       }
+
+      rafId = requestAnimationFrame(scrollLoop);
+    };
+
+    this.autoScrollHandler = (e) => {
+      lastMouseY = e.clientY;
     };
 
     document.addEventListener('dragover', this.autoScrollHandler);
+    rafId = requestAnimationFrame(scrollLoop);
+
+    // Store rafId for cleanup
+    this._autoScrollRafId = rafId;
   }
 
   /**
@@ -318,6 +334,10 @@ export class WeekView {
     if (this.autoScrollHandler) {
       document.removeEventListener('dragover', this.autoScrollHandler);
       this.autoScrollHandler = null;
+    }
+    if (this._autoScrollRafId) {
+      cancelAnimationFrame(this._autoScrollRafId);
+      this._autoScrollRafId = null;
     }
   }
 

@@ -164,3 +164,12 @@ export function getCourseName(title) {
   // Trim any trailing separators
   return coursePart.replace(/[\-:;\|\/]\s*$/, '').trim();
 }
+
+/**
+ * Get unique event ID from event object
+ * @param {Object} event - The event object
+ * @returns {string} Unique event ID
+ */
+export function getEventId(event) {
+  return event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+}

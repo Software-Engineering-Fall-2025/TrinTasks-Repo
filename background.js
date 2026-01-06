@@ -222,11 +222,14 @@ async function checkUpcomingAssignments() {
       return;
     }
 
+    // Get all existing alarms ONCE before the loop (optimization)
+    const existingAlarms = await chrome.alarms.getAll();
+    const existingAlarmNames = new Set(existingAlarms.map(a => a.name));
+
     const now = Date.now();
     const leadHours = parseInt(settings.hours, 10) || 24;
     let scheduledCount = 0;
 
-    // Use for...of loop instead of forEach to properly handle async
     for (const event of events) {
       // Skip if not an assignment or already completed
       if (!event.isAssignment || event.isCompleted) continue;
@@ -247,11 +250,15 @@ async function checkUpcomingAssignments() {
       const targetTime = dueTimestamp - intervalMs;
       const reminderId = `reminder_${eventId}_${leadHours}h`;
 
-      // Skip if already reminded
+      // Skip if already reminded (this is the key check to prevent duplicates)
       if (reminderHistory[reminderId]) continue;
 
-      // Skip if already scheduled
-      if (reminders[reminderId]) continue;
+      // Skip if already scheduled and alarm still exists (O(1) lookup now)
+      if (reminders[reminderId]) {
+        if (existingAlarmNames.has(reminderId)) continue;
+        // Alarm was cleared but reminder data exists - clean it up
+        delete reminders[reminderId];
+      }
 
       if (targetTime <= now) {
         // If we're already past the target but before due, trigger soon
@@ -263,6 +270,7 @@ async function checkUpcomingAssignments() {
           dueTime: event.dueTime,
           intervalHours: leadHours
         };
+        // Mark in history BEFORE creating alarm to prevent race conditions
         reminderHistory[reminderId] = true;
         chrome.alarms.create(reminderId, { delayInMinutes: 0.5 });
         scheduledCount++;
@@ -277,6 +285,9 @@ async function checkUpcomingAssignments() {
           dueTime: event.dueTime,
           intervalHours: leadHours
         };
+        // Mark in history BEFORE creating alarm to prevent duplicate scheduling
+        // This is the key fix - we mark it as "handled" as soon as we schedule it
+        reminderHistory[reminderId] = true;
         chrome.alarms.create(reminderId, { delayInMinutes: delayMinutes });
         scheduledCount++;
         console.log('Scheduled future reminder for:', event.title, 'in', Math.round(delayMinutes), 'minutes');
@@ -355,7 +366,7 @@ chrome.notifications.onClicked.addListener((notificationId) => {
 
 async function refreshCalendarData(overrideUrl, isManualRefresh = false) {
   try {
-    const data = await chrome.storage.local.get(['icalUrl', 'events', 'completedAssignments']);
+    const data = await chrome.storage.local.get(['icalUrl', 'events', 'completedAssignments', 'inProgressAssignments']);
     const icalUrl = overrideUrl || data.icalUrl;
     if (!icalUrl) {
       console.log('No iCal URL configured, skipping refresh');
@@ -364,6 +375,7 @@ async function refreshCalendarData(overrideUrl, isManualRefresh = false) {
 
     const previousEvents = data.events || [];
     const completedAssignments = data.completedAssignments || {};
+    const inProgressAssignments = data.inProgressAssignments || {};
 
     console.log('Refreshing calendar from:', icalUrl);
     const newEvents = await ICalParser.fetchAndParse(icalUrl);
@@ -388,33 +400,60 @@ async function refreshCalendarData(overrideUrl, isManualRefresh = false) {
         const prevClone = { ...prev };
         delete prevClone.isCompleted;
         delete prevClone.completedDate;
+        delete prevClone.isInProgress;
+        delete prevClone.inProgressDate;
         const currClone = { ...ev };
         if (JSON.stringify(prevClone) !== JSON.stringify(currClone)) {
           updated++;
         }
       }
-      // Preserve completion if present
+      // Preserve completion status if present
       if (completedAssignments[id]) {
         ev.isCompleted = true;
         ev.completedDate = completedAssignments[id].completedDate;
       }
+      // Preserve in-progress status if present (and not completed)
+      if (inProgressAssignments[id] && !ev.isCompleted) {
+        ev.isInProgress = true;
+        ev.inProgressDate = inProgressAssignments[id].inProgressDate;
+      }
       nextEvents.push(ev);
     });
 
-    // Removed events: present before but not now
+    // Preserve custom assignments (user-created, not from iCal)
+    previousEvents.forEach(ev => {
+      if (ev.uid && ev.uid.startsWith('custom_')) {
+        // Keep custom assignments, preserve their status
+        const id = ev.uid;
+        if (completedAssignments[id]) {
+          ev.isCompleted = true;
+          ev.completedDate = completedAssignments[id].completedDate;
+        }
+        if (inProgressAssignments[id] && !ev.isCompleted) {
+          ev.isInProgress = true;
+          ev.inProgressDate = inProgressAssignments[id].inProgressDate;
+        }
+        nextEvents.push(ev);
+      }
+    });
+
+    // Removed events: present before but not now (excluding custom assignments)
     const nextIds = new Set(nextEvents.map(ev => ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`));
     let removed = 0;
     previousEvents.forEach(ev => {
       const id = ev.uid || `${ev.title}_${ev.dueRaw || ev.startRaw}`;
-      if (!nextIds.has(id)) {
+      // Don't count custom assignments as removed
+      if (!nextIds.has(id) && !(ev.uid && ev.uid.startsWith('custom_'))) {
         removed++;
         delete completedAssignments[id];
+        delete inProgressAssignments[id];
       }
     });
 
     await chrome.storage.local.set({
       events: nextEvents,
       completedAssignments,
+      inProgressAssignments,
       lastUpdated: new Date().toISOString(),
       lastRefreshSummary: {
         added,
@@ -782,6 +821,75 @@ function ICalDateToTimestamp(dateTime) {
   return 0;
 }
 
+// Clean up stale reminder data for past-due assignments
+async function cleanupStaleReminders() {
+  try {
+    const data = await chrome.storage.local.get(['events', 'reminders', 'reminderHistory', 'assignmentReminders']);
+    const events = data.events || [];
+    const reminders = data.reminders || {};
+    const reminderHistory = data.reminderHistory || {};
+    const assignmentReminders = data.assignmentReminders || {};
+
+    const now = Date.now();
+    let cleanedCount = 0;
+
+    // Build a set of valid event IDs
+    const validEventIds = new Set();
+    events.forEach(event => {
+      const eventId = event.uid || `${event.title}_${event.dueRaw || event.startRaw}`;
+      const dueTimestamp = ICalDateToTimestamp(event.dueRaw || event.startRaw);
+      // Only keep events that are still in the future
+      if (dueTimestamp > now) {
+        validEventIds.add(eventId);
+      }
+    });
+
+    // Clean up reminders for past-due or removed assignments
+    for (const reminderId of Object.keys(reminders)) {
+      // Extract eventId from reminder ID: reminder_${eventId}_${leadHours}h
+      const match = reminderId.match(/^reminder_(.+)_\d+h$/);
+      if (match) {
+        const eventId = match[1];
+        if (!validEventIds.has(eventId)) {
+          delete reminders[reminderId];
+          delete reminderHistory[reminderId];
+          // Also clear any existing alarm
+          await chrome.alarms.clear(reminderId);
+          cleanedCount++;
+        }
+      }
+    }
+
+    // Clean up reminderHistory entries for past-due assignments
+    for (const reminderId of Object.keys(reminderHistory)) {
+      const match = reminderId.match(/^reminder_(.+)_\d+h$/);
+      if (match) {
+        const eventId = match[1];
+        if (!validEventIds.has(eventId)) {
+          delete reminderHistory[reminderId];
+          cleanedCount++;
+        }
+      }
+    }
+
+    // Clean up assignment-specific reminders for past-due assignments
+    for (const eventId of Object.keys(assignmentReminders)) {
+      if (!validEventIds.has(eventId)) {
+        delete assignmentReminders[eventId];
+        await chrome.alarms.clear(`assignment_reminder_${eventId}`);
+        cleanedCount++;
+      }
+    }
+
+    if (cleanedCount > 0) {
+      await chrome.storage.local.set({ reminders, reminderHistory, assignmentReminders });
+      console.log(`Cleaned up ${cleanedCount} stale reminder entries`);
+    }
+  } catch (err) {
+    console.error('Error cleaning up stale reminders:', err);
+  }
+}
+
 // Initialize on service worker startup (after helpers are defined to avoid TDZ errors)
 (async function initializeServiceWorker() {
   console.log('TrinTasks service worker initializing...');
@@ -806,6 +914,14 @@ function ICalDateToTimestamp(dateTime) {
     console.log('Calendar data refreshed on startup');
   } catch (err) {
     console.warn('Failed to refresh calendar on startup:', err);
+  }
+
+  // Clean up stale reminders before checking for new ones
+  try {
+    await cleanupStaleReminders();
+    console.log('Cleaned up stale reminders on startup');
+  } catch (err) {
+    console.warn('Failed to clean up stale reminders:', err);
   }
 
   // Check for upcoming assignments and schedule reminders

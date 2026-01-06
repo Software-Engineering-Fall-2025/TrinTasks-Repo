@@ -1284,6 +1284,11 @@ button:active {
   z-index: 500;
 }
 
+/* When menu is open, disable pointer events on other events via CSS (faster than JS loop) */
+body.menu-open .event:not(.menu-active) {
+  pointer-events: none;
+}
+
 .event:hover {
   transform: translate(-3px, -3px);
   box-shadow: var(--shadow-hover);
@@ -1883,6 +1888,28 @@ button:active {
   font-size: 13px;
 }
 
+.tag-name-input {
+  flex: 1;
+  font-weight: 600;
+  color: var(--black);
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  transition: all 0.15s ease;
+}
+
+.tag-name-input:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.tag-name-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--white);
+}
+
 /* Toast */
 .refresh-toast {
   position: absolute;
@@ -2401,6 +2428,19 @@ body.theme-midnight .tag-color-input {
 
 body.theme-midnight .tag-name {
   color: #e2e8f0;
+}
+
+body.theme-midnight .tag-name-input {
+  color: #e2e8f0;
+}
+
+body.theme-midnight .tag-name-input:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.theme-midnight .tag-name-input:focus {
+  background: #252b3d;
+  border-color: var(--accent);
 }
 
 body.theme-midnight .filter-select {
@@ -3685,6 +3725,20 @@ body.ui-glass .tag-name {
   color: #1f2937;
 }
 
+body.ui-glass .tag-name-input {
+  color: #1f2937;
+  border-radius: 6px;
+}
+
+body.ui-glass .tag-name-input:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.ui-glass .tag-name-input:focus {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--accent);
+}
+
 body.ui-glass .tag-color-input {
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
@@ -4126,6 +4180,19 @@ body.ui-glass.theme-midnight .subject-tag-item {
 
 body.ui-glass.theme-midnight .tag-name {
   color: #e2e8f0;
+}
+
+body.ui-glass.theme-midnight .tag-name-input {
+  color: #e2e8f0;
+}
+
+body.ui-glass.theme-midnight .tag-name-input:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.ui-glass.theme-midnight .tag-name-input:focus {
+  background: rgba(37, 43, 61, 0.9);
+  border-color: var(--accent);
 }
 
 body.ui-glass.theme-midnight .tag-color-input {

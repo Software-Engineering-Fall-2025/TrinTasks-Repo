@@ -52,10 +52,8 @@ export class EventRenderer {
         parentEvent.classList.remove('menu-active');
       }
 
-      // Re-enable pointer events on all event cards
-      document.querySelectorAll('.event').forEach(el => {
-        el.style.pointerEvents = '';
-      });
+      // Remove menu-open class from body (used for CSS-based pointer blocking)
+      document.body.classList.remove('menu-open');
 
       this.activeMenu = null;
     }
@@ -199,16 +197,11 @@ export class EventRenderer {
     menuContainer.classList.add('menu-open');
     this.activeMenu = menuContainer;
 
-    // Add menu-active class to parent event card and disable pointer events on other cards
-    const parentEvent = eventDiv;
-    parentEvent.classList.add('menu-active');
+    // Add menu-active class to parent event card
+    eventDiv.classList.add('menu-active');
 
-    // Disable pointer events on all other event cards to prevent interference
-    document.querySelectorAll('.event').forEach(el => {
-      if (el !== parentEvent) {
-        el.style.pointerEvents = 'none';
-      }
-    });
+    // Add menu-open class to body for CSS-based pointer blocking (much faster than JS loop)
+    document.body.classList.add('menu-open');
 
     // Position the dropdown
     this.positionDropdown(menuContainer, dropdown);
@@ -256,7 +249,8 @@ export class EventRenderer {
 
     // Apply subject color if available
     const subjectTag = this.getSubjectFromTitle(event.title);
-    const courseFullName = getCourseName(event.title) || (subjectTag ? subjectTag.name : '');
+    // Use subject tag's display name if available, otherwise extract from title
+    const courseFullName = subjectTag ? subjectTag.name : getCourseName(event.title);
     if (subjectTag) {
       eventDiv.style.borderLeftWidth = '4px';
       eventDiv.style.borderLeftColor = subjectTag.color;

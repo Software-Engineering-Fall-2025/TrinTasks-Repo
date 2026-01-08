@@ -4698,3 +4698,525 @@ body.ui-glass.theme-midnight .action-submenu {
   background: rgba(30, 41, 59, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
+
+/* ===== Tutorial Overlay ===== */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tutorial-overlay.hidden {
+  display: none;
+}
+
+.tutorial-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.tutorial-modal {
+  position: relative;
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: var(--radius);
+  box-shadow: 8px 8px 0px #000000;
+  width: 90%;
+  max-width: 400px;
+  overflow: hidden;
+  animation: tutorialSlideIn 0.3s ease;
+}
+
+@keyframes tutorialSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tutorial-progress {
+  height: 4px;
+  background: #e5e7eb;
+}
+
+.tutorial-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  width: 12.5%;
+}
+
+.tutorial-content {
+  padding: 24px;
+  text-align: center;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tutorial-step {
+  animation: tutorialFadeIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tutorial-step.hidden {
+  display: none;
+}
+
+@keyframes tutorialFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tutorial-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tutorial Icon: Logo */
+.tutorial-icon-logo {
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--accent);
+  color: white;
+  padding: 12px 20px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0 #000;
+}
+.tutorial-icon-logo .tut-logo-trin {
+  color: white;
+}
+.tutorial-icon-logo .tut-logo-tasks {
+  color: rgba(255,255,255,0.8);
+}
+
+/* Tutorial Icon: Calendar Grid */
+.tutorial-icon-calendar {
+  font-size: inherit;
+}
+.tut-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  padding: 8px;
+  background: var(--surface);
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #000;
+}
+.tut-cal-grid span {
+  width: 12px;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+.tut-cal-grid .tut-cal-today {
+  background: var(--accent);
+}
+
+/* Tutorial Icon: Button Style */
+.tutorial-icon-btn {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* Tutorial Icon: Three Dots Menu */
+.tutorial-icon-dots {
+  width: 40px;
+  height: 40px;
+  background: var(--surface);
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #000;
+  font-size: 20px;
+  font-weight: bold;
+  color: #666;
+}
+
+/* Tutorial Icon: Bell */
+.tutorial-icon-bell {
+  width: 48px;
+  height: 48px;
+  background: var(--accent);
+  border: 2px solid #000;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 #000;
+  padding: 10px;
+  color: white;
+}
+.tutorial-icon-bell svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tutorial Icon: Drag Handle */
+.tutorial-icon-drag {
+  flex-direction: column;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  background: var(--surface);
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #000;
+  padding: 8px;
+}
+.tutorial-icon-drag span {
+  width: 100%;
+  height: 3px;
+  background: #999;
+  border-radius: 2px;
+}
+
+/* Tutorial Icon: Sidebar Layout */
+.tutorial-icon-sidebar {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: var(--surface);
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #000;
+}
+.tut-sidebar-main {
+  width: 50px;
+  height: 40px;
+  background: #e5e7eb;
+  border-radius: 3px;
+}
+.tut-sidebar-bar {
+  width: 24px;
+  height: 40px;
+  background: var(--accent);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 4px;
+}
+.tut-sidebar-bar span {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 2px;
+}
+
+/* Tutorial Icon: Checkmark */
+.tutorial-icon-check {
+  width: 48px;
+  height: 48px;
+  background: #34d399;
+  border: 2px solid #000;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 #000;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+}
+
+.tutorial-content h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: var(--black);
+}
+
+.tutorial-content p {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tutorial-content strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tutorial-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 2px solid var(--black);
+  background: #f9fafb;
+}
+
+.tutorial-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.tutorial-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 2px solid var(--black);
+}
+
+.tutorial-btn-skip {
+  background: transparent;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.tutorial-btn-skip:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.tutorial-btn-nav {
+  background: var(--white);
+  color: var(--black);
+}
+
+.tutorial-btn-nav:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0px var(--black);
+}
+
+.tutorial-btn-nav.hidden {
+  display: none;
+}
+
+.tutorial-btn-primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--black);
+}
+
+.tutorial-btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0px var(--black);
+}
+
+.tutorial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tutorial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.tutorial-dot.active {
+  background: var(--accent);
+  transform: scale(1.2);
+}
+
+/* Tutorial - Midnight Theme */
+body.theme-midnight .tutorial-modal {
+  background: #1e293b;
+  border-color: #cbd5e1;
+}
+
+body.theme-midnight .tutorial-progress {
+  background: #334155;
+}
+
+body.theme-midnight .tutorial-content h2 {
+  color: #f1f5f9;
+}
+
+body.theme-midnight .tutorial-content p {
+  color: #94a3b8;
+}
+
+body.theme-midnight .tutorial-footer {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.theme-midnight .tutorial-btn-skip {
+  color: #94a3b8;
+  border-color: #475569;
+}
+
+body.theme-midnight .tutorial-btn-skip:hover {
+  background: #334155;
+}
+
+body.theme-midnight .tutorial-btn-nav {
+  background: #334155;
+  color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+body.theme-midnight .tutorial-dots {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.theme-midnight .tutorial-dot {
+  background: #475569;
+}
+
+/* Tutorial Icons - Midnight Theme */
+body.theme-midnight .tutorial-icon-logo,
+body.theme-midnight .tutorial-icon-btn {
+  border-color: #cbd5e1;
+  box-shadow: 2px 2px 0 #cbd5e1;
+}
+
+body.theme-midnight .tutorial-icon-calendar .tut-cal-grid,
+body.theme-midnight .tutorial-icon-dots,
+body.theme-midnight .tutorial-icon-drag,
+body.theme-midnight .tutorial-icon-sidebar {
+  background: #1e293b;
+  border-color: #cbd5e1;
+  box-shadow: 2px 2px 0 #cbd5e1;
+}
+
+body.theme-midnight .tut-cal-grid span {
+  background: #334155;
+}
+
+body.theme-midnight .tutorial-icon-dots {
+  color: #94a3b8;
+}
+
+body.theme-midnight .tutorial-icon-drag span {
+  background: #64748b;
+}
+
+body.theme-midnight .tut-sidebar-main {
+  background: #334155;
+}
+
+body.theme-midnight .tutorial-icon-bell,
+body.theme-midnight .tutorial-icon-check {
+  border-color: #cbd5e1;
+  box-shadow: 2px 2px 0 #cbd5e1;
+}
+
+/* Tutorial - Glass UI */
+body.ui-glass .tutorial-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+body.ui-glass .tutorial-footer {
+  background: rgba(249, 250, 251, 0.8);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.ui-glass .tutorial-btn {
+  border-radius: 8px;
+  border-width: 1px;
+}
+
+body.ui-glass .tutorial-btn-primary:hover,
+body.ui-glass .tutorial-btn-nav:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.ui-glass .tutorial-dots {
+  background: rgba(249, 250, 251, 0.5);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Tutorial - Glass Midnight */
+body.ui-glass.theme-midnight .tutorial-modal {
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.ui-glass.theme-midnight .tutorial-footer {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.ui-glass.theme-midnight .tutorial-dots {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Tutorial Icons - Glass UI */
+body.ui-glass .tutorial-icon-logo,
+body.ui-glass .tutorial-icon-btn {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.ui-glass .tutorial-icon-calendar .tut-cal-grid,
+body.ui-glass .tutorial-icon-dots,
+body.ui-glass .tutorial-icon-drag,
+body.ui-glass .tutorial-icon-sidebar {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body.ui-glass .tutorial-icon-bell,
+body.ui-glass .tutorial-icon-check {
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tutorial Icons - Glass Midnight */
+body.ui-glass.theme-midnight .tutorial-icon-calendar .tut-cal-grid,
+body.ui-glass.theme-midnight .tutorial-icon-dots,
+body.ui-glass.theme-midnight .tutorial-icon-drag,
+body.ui-glass.theme-midnight .tutorial-icon-sidebar {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.ui-glass.theme-midnight .tut-cal-grid span {
+  background: #475569;
+}
+
+body.ui-glass.theme-midnight .tut-sidebar-main {
+  background: #475569;
+}

@@ -91,6 +91,17 @@ export class UIController {
     // Subject tags elements
     this.subjectTagsDiv = document.getElementById('subjectTags');
 
+    // Tutorial elements
+    this.tutorialOverlay = document.getElementById('tutorialOverlay');
+    this.tutorialContent = document.getElementById('tutorialContent');
+    this.tutorialProgressBar = document.getElementById('tutorialProgressBar');
+    this.tutorialDots = document.getElementById('tutorialDots');
+    this.tutorialPrevBtn = document.getElementById('tutorialPrev');
+    this.tutorialNextBtn = document.getElementById('tutorialNext');
+    this.tutorialSkipBtn = document.getElementById('tutorialSkip');
+    this.tutorialCurrentStep = 1;
+    this.tutorialTotalSteps = 9;
+
     // Setup view elements
     this.setupView = document.getElementById('setupView');
     this.setupThemes = document.getElementById('setupThemes');
@@ -228,6 +239,9 @@ export class UIController {
         }
       });
     }
+
+    // Tutorial event listeners
+    this.setupTutorialListeners();
 
     // Settings event listeners
     this.settingsBtn.addEventListener('click', () => this.openSettings());
@@ -383,6 +397,8 @@ export class UIController {
       await saveToStorage(url, events);
       // Save the selected theme from setup
       await this.handleSaveSettings();
+      // Show tutorial for first-time users
+      await this.showTutorial();
     } catch (error) {
       console.error('Parse error:', error);
       this.showError(error.message);
@@ -1604,5 +1620,101 @@ export class UIController {
     } else {
       this.weatherSelector.classList.add('hidden');
     }
+  }
+
+  // Tutorial methods
+  setupTutorialListeners() {
+    if (this.tutorialNextBtn) {
+      this.tutorialNextBtn.addEventListener('click', () => this.nextTutorialStep());
+    }
+    if (this.tutorialPrevBtn) {
+      this.tutorialPrevBtn.addEventListener('click', () => this.prevTutorialStep());
+    }
+    if (this.tutorialSkipBtn) {
+      this.tutorialSkipBtn.addEventListener('click', () => this.closeTutorial());
+    }
+  }
+
+  async showTutorial() {
+    if (!this.tutorialOverlay) return;
+
+    // Check if tutorial was already completed
+    const data = await chrome.storage.local.get(['tutorialCompleted']);
+    if (data.tutorialCompleted) return;
+
+    // Initialize tutorial
+    this.tutorialCurrentStep = 1;
+    this.createTutorialDots();
+    this.updateTutorialStep();
+    this.tutorialOverlay.classList.remove('hidden');
+  }
+
+  closeTutorial() {
+    if (!this.tutorialOverlay) return;
+    this.tutorialOverlay.classList.add('hidden');
+    // Mark tutorial as completed
+    chrome.storage.local.set({ tutorialCompleted: true });
+  }
+
+  createTutorialDots() {
+    if (!this.tutorialDots) return;
+    this.tutorialDots.innerHTML = '';
+    for (let i = 1; i <= this.tutorialTotalSteps; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'tutorial-dot';
+      if (i === 1) dot.classList.add('active');
+      dot.addEventListener('click', () => this.goToTutorialStep(i));
+      this.tutorialDots.appendChild(dot);
+    }
+  }
+
+  updateTutorialStep() {
+    // Update step visibility
+    const steps = this.tutorialContent.querySelectorAll('.tutorial-step');
+    steps.forEach(step => {
+      const stepNum = parseInt(step.getAttribute('data-step'));
+      step.classList.toggle('hidden', stepNum !== this.tutorialCurrentStep);
+    });
+
+    // Update progress bar
+    const progress = (this.tutorialCurrentStep / this.tutorialTotalSteps) * 100;
+    if (this.tutorialProgressBar) {
+      this.tutorialProgressBar.style.width = `${progress}%`;
+    }
+
+    // Update dots
+    const dots = this.tutorialDots.querySelectorAll('.tutorial-dot');
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index + 1 === this.tutorialCurrentStep);
+    });
+
+    // Update button visibility
+    if (this.tutorialPrevBtn) {
+      this.tutorialPrevBtn.classList.toggle('hidden', this.tutorialCurrentStep === 1);
+    }
+    if (this.tutorialNextBtn) {
+      this.tutorialNextBtn.textContent = this.tutorialCurrentStep === this.tutorialTotalSteps ? 'Done' : 'Next';
+    }
+  }
+
+  nextTutorialStep() {
+    if (this.tutorialCurrentStep >= this.tutorialTotalSteps) {
+      this.closeTutorial();
+      return;
+    }
+    this.tutorialCurrentStep++;
+    this.updateTutorialStep();
+  }
+
+  prevTutorialStep() {
+    if (this.tutorialCurrentStep <= 1) return;
+    this.tutorialCurrentStep--;
+    this.updateTutorialStep();
+  }
+
+  goToTutorialStep(step) {
+    if (step < 1 || step > this.tutorialTotalSteps) return;
+    this.tutorialCurrentStep = step;
+    this.updateTutorialStep();
   }
 }

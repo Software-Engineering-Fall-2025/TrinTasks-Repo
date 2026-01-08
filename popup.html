@@ -301,6 +301,80 @@
         <button id="easterEggClose" class="easter-egg-btn">Awesome!</button>
       </div>
     </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay hidden">
+      <div class="tutorial-backdrop"></div>
+      <div class="tutorial-modal">
+        <div class="tutorial-progress">
+          <div class="tutorial-progress-bar" id="tutorialProgressBar"></div>
+        </div>
+        <div class="tutorial-content" id="tutorialContent">
+          <!-- Step 1: Welcome -->
+          <div class="tutorial-step" data-step="1">
+            <div class="tutorial-icon tutorial-icon-logo"><span class="tut-logo-trin">Trin</span><span class="tut-logo-tasks">Tasks</span></div>
+            <h2>Welcome to TrinTasks!</h2>
+            <p>Your calendar has been loaded successfully. Let's take a quick tour of all the features to help you stay organized.</p>
+          </div>
+          <!-- Step 2: Week Calendar -->
+          <div class="tutorial-step hidden" data-step="2">
+            <div class="tutorial-icon tutorial-icon-calendar"><div class="tut-cal-grid"><span></span><span></span><span></span><span></span><span class="tut-cal-today"></span><span></span><span></span></div></div>
+            <h2>Week Calendar</h2>
+            <p>Click any day in the calendar to see assignments due that day. Today is highlighted, and the selected day has a border.</p>
+          </div>
+          <!-- Step 3: Week/Day View Toggle -->
+          <div class="tutorial-step hidden" data-step="3">
+            <div class="tutorial-icon tutorial-icon-btn">Week</div>
+            <h2>Week View</h2>
+            <p>Click the <strong>Week</strong> button in the header to see all assignments for the entire week grouped by day.</p>
+          </div>
+          <!-- Step 4: Assignment Actions -->
+          <div class="tutorial-step hidden" data-step="4">
+            <div class="tutorial-icon tutorial-icon-dots">&#8942;</div>
+            <h2>Assignment Actions</h2>
+            <p>Click the <strong>three dots</strong> on any assignment to access actions: mark complete, mark in-progress, or set a reminder.</p>
+          </div>
+          <!-- Step 5: Reminders -->
+          <div class="tutorial-step hidden" data-step="5">
+            <div class="tutorial-icon tutorial-icon-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+            <h2>Reminders</h2>
+            <p>Set reminders for individual assignments to get notified 1, 2, 4, or 24 hours before they're due.</p>
+          </div>
+          <!-- Step 6: Drag to Reorder -->
+          <div class="tutorial-step hidden" data-step="6">
+            <div class="tutorial-icon tutorial-icon-drag"><span></span><span></span><span></span></div>
+            <h2>Drag to Reorder</h2>
+            <p>Drag and drop assignments to reorder them by priority. Your custom order is saved automatically.</p>
+          </div>
+          <!-- Step 7: Major Assignments Sidebar -->
+          <div class="tutorial-step hidden" data-step="7">
+            <div class="tutorial-icon tutorial-icon-sidebar"><div class="tut-sidebar-main"></div><div class="tut-sidebar-bar"><span></span><span></span></div></div>
+            <h2>Major Assignments</h2>
+            <p>Enable the <strong>Major Assignments sidebar</strong> in Settings to see upcoming tests, quizzes, essays, and projects at a glance on the right side of the screen.</p>
+          </div>
+          <!-- Step 8: Settings -->
+          <div class="tutorial-step hidden" data-step="8">
+            <div class="tutorial-icon tutorial-icon-btn">Settings</div>
+            <h2>Settings</h2>
+            <p>Click <strong>Settings</strong> to change themes, customize colors for each class, enable the major assignments sidebar, and configure reminders.</p>
+          </div>
+          <!-- Step 9: Done -->
+          <div class="tutorial-step hidden" data-step="9">
+            <div class="tutorial-icon tutorial-icon-check">&#10003;</div>
+            <h2>You're All Set!</h2>
+            <p>That's everything you need to know. Stay organized and good luck with your assignments!</p>
+          </div>
+        </div>
+        <div class="tutorial-footer">
+          <button id="tutorialSkip" class="tutorial-btn tutorial-btn-skip">Skip Tutorial</button>
+          <div class="tutorial-nav">
+            <button id="tutorialPrev" class="tutorial-btn tutorial-btn-nav hidden">Back</button>
+            <button id="tutorialNext" class="tutorial-btn tutorial-btn-primary">Next</button>
+          </div>
+        </div>
+        <div class="tutorial-dots" id="tutorialDots"></div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="popup.js"></script>

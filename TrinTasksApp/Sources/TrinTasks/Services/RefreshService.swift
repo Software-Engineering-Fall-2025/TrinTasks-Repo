@@ -17,7 +17,7 @@ final class RefreshService {
         scheduler.qualityOfService = .utility
         scheduler.schedule { [weak self] completion in
             self?.handler()
-            completion(.success)
+            completion(.finished)
         }
         activity = scheduler
     }

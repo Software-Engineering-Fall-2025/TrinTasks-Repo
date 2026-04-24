@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 
+@MainActor
 final class MenuBarController {
     private var statusItem: NSStatusItem!
     private var panel: NSPanel!

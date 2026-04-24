@@ -1,0 +1,19 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/master.swiftdeps"
+  },
+  "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/ICalServiceTests.swift": {
+    "dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.d",
+    "object": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.swift.o",
+    "swiftmodule": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.swiftdeps",
+    "diagnostics": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.dia"
+  },
+  "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/StorageServiceTests.swift": {
+    "dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.d",
+    "object": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.swift.o",
+    "swiftmodule": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.swiftdeps",
+    "diagnostics": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.dia"
+  }
+}

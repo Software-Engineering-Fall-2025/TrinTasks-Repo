@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/master.swiftdeps"
+  },
+  "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasksApp/TrinTasksEntry.swift": {
+    "dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.d",
+    "object": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.swift.o",
+    "swiftmodule": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry~partial.swiftmodule",
+    "swift-dependencies": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.swiftdeps",
+    "diagnostics": "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.dia"
+  }
+}

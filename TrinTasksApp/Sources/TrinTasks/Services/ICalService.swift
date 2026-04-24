@@ -122,7 +122,7 @@ final class ICalService {
     // MARK: - Trinity-Specific Logic
 
     private static func extractSubject(from title: String) -> String? {
-        let pattern = #"^((?:ADV\.\s+)?[A-Z][A-Z0-9\s:\/]+-\s*[A-Z0-9]+):"#
+        let pattern = #"^((?:ADV\.\s+)?[A-Za-z][A-Za-z0-9\s:\/]+-\s*[A-Za-z0-9]+):"#
         guard let regex = try? NSRegularExpression(pattern: pattern),
               let match = regex.firstMatch(in: title, range: NSRange(title.startIndex..., in: title)),
               let range = Range(match.range(at: 1), in: title) else { return nil }

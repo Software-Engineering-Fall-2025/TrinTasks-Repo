@@ -7,13 +7,19 @@ let package = Package(
         .macOS(.v13)
     ],
     targets: [
+        // Library: all logic, views, services (no @main)
         .target(
             name: "TrinTasks",
             path: "Sources/TrinTasks",
-            resources: [
-                .process("Resources")
-            ]
+            exclude: ["App/TrinTasksApp.swift"]
         ),
+        // Executable: thin entry point only
+        .executableTarget(
+            name: "TrinTasksApp",
+            dependencies: ["TrinTasks"],
+            path: "Sources/TrinTasksApp"
+        ),
+        // Tests depend on library, not executable
         .testTarget(
             name: "TrinTasksTests",
             dependencies: ["TrinTasks"],

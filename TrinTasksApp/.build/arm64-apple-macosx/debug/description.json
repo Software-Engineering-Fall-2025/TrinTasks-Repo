@@ -1,0 +1,1381 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.xctest/Contents/MacOS/TrinTasksPackageTests",
+      "packagePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp",
+      "productName" : "TrinTasksPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.TrinTasks-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/sources",
+      "importPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/AppDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/MenuBarController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/AppSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/Assignment.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/CalendarEvent.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/EventMetadata.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/ICalService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/NotificationService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/RefreshService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/StorageService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Store/AppStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/BrutalStyle.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/Color+Hex.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/Theme.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeDefinitions.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/AssignmentCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/DayView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SidebarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/TopBarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/WeekView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "TrinTasks",
+      "moduleOutputPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasks.swiftmodule",
+      "objects" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppDelegate.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/MenuBarController.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppSettings.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Assignment.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/CalendarEvent.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/EventMetadata.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ICalService.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/NotificationService.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/RefreshService.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/StorageService.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppStore.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/BrutalStyle.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Color+Hex.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Theme.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeDefinitions.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeManager.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AssignmentCard.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ContentView.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/DayView.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SettingsView.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SidebarView.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/TopBarView.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/WeekView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/include/TrinTasks-Swift.h",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "trintasksapp"
+      ],
+      "outputFileMapPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppDelegate.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/MenuBarController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppSettings.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Assignment.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/CalendarEvent.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/EventMetadata.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ICalService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/NotificationService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/RefreshService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/StorageService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/BrutalStyle.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Color+Hex.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Theme.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeDefinitions.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AssignmentCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/DayView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SidebarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/TopBarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/WeekView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasks.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/AppDelegate.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/MenuBarController.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/AppSettings.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/Assignment.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/CalendarEvent.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/EventMetadata.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/ICalService.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/NotificationService.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/RefreshService.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/StorageService.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Store/AppStore.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/BrutalStyle.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/Color+Hex.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/Theme.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeDefinitions.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeManager.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/AssignmentCard.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/ContentView.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/DayView.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SettingsView.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SidebarView.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/TopBarView.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/WeekView.swift"
+      ],
+      "tempsPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.TrinTasksApp-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/sources",
+      "importPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasksApp/TrinTasksEntry.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasks.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "TrinTasksApp",
+      "moduleOutputPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksApp.swiftmodule",
+      "objects" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "TrinTasksApp_main",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "trintasksapp"
+      ],
+      "outputFileMapPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksApp.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasksApp/TrinTasksEntry.swift"
+      ],
+      "tempsPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.TrinTasksPackageTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/sources",
+      "importPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "TrinTasksPackageTests",
+      "moduleOutputPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/include/TrinTasksPackageTests-Swift.h",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "trintasksapp"
+      ],
+      "outputFileMapPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.TrinTasksTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/sources",
+      "importPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/ICalServiceTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/StorageServiceTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasks.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "TrinTasksTests",
+      "moduleOutputPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksTests.swiftmodule",
+      "objects" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.swift.o",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "trintasksapp"
+      ],
+      "outputFileMapPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules/TrinTasksTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/ICalServiceTests.swift",
+        "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/StorageServiceTests.swift"
+      ],
+      "tempsPath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "TrinTasks" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "TrinTasks",
+      "-package-name",
+      "trintasksapp",
+      "-c",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/AppDelegate.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/MenuBarController.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/AppSettings.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/Assignment.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/CalendarEvent.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/EventMetadata.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/ICalService.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/NotificationService.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/RefreshService.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/StorageService.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Store/AppStore.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/BrutalStyle.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/Color+Hex.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/Theme.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeDefinitions.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeManager.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/AssignmentCard.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/ContentView.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/DayView.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SettingsView.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SidebarView.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/TopBarView.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/WeekView.swift",
+      "-I",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/include/TrinTasks-Swift.h",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "trintasksapp",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "TrinTasksApp" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "TrinTasksApp",
+      "-package-name",
+      "trintasksapp",
+      "-c",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasksApp/TrinTasksEntry.swift",
+      "-I",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "TrinTasksApp_main",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "trintasksapp",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "TrinTasksPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "TrinTasksPackageTests",
+      "-package-name",
+      "trintasksapp",
+      "-c",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/include/TrinTasksPackageTests-Swift.h",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "trintasksapp",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "TrinTasksTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "TrinTasksTests",
+      "-package-name",
+      "trintasksapp",
+      "-c",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/ICalServiceTests.swift",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/StorageServiceTests.swift",
+      "-I",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "trintasksapp",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "TrinTasks" : [
+
+    ],
+    "TrinTasksApp" : [
+      "TrinTasks"
+    ],
+    "TrinTasksPackageTests" : [
+      "TrinTasksTests",
+      "TrinTasks"
+    ],
+    "TrinTasksTests" : [
+      "TrinTasks"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/AppDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/App/MenuBarController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/AppSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/Assignment.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/CalendarEvent.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Models/EventMetadata.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/ICalService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/NotificationService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/RefreshService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Services/StorageService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Store/AppStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/BrutalStyle.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Style/Color+Hex.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/Theme.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeDefinitions.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Themes/ThemeManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/AssignmentCard.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/DayView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/SidebarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/TopBarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasks/Views/WeekView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/sources"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp-entitlement.plist"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Sources/TrinTasksApp/TrinTasksEntry.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/sources"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppDelegate.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppSettings.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Assignment.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AssignmentCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/BrutalStyle.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/CalendarEvent.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Color+Hex.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/DayView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/EventMetadata.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ICalService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/MenuBarController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/NotificationService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/RefreshService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SidebarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/StorageService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Theme.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeDefinitions.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/TopBarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/WeekView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.build/TrinTasksEntry.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksApp.product/Objects.LinkFileList"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/sources"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppDelegate.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppSettings.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AppStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Assignment.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/AssignmentCard.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/BrutalStyle.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/CalendarEvent.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Color+Hex.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/DayView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/EventMetadata.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ICalService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/MenuBarController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/NotificationService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/RefreshService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/SidebarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/StorageService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/Theme.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeDefinitions.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/ThemeManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/TopBarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasks.build/WeekView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/ICalServiceTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/StorageServiceTests.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/ICalServiceTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/Tests/TrinTasksTests/StorageServiceTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/TrinTasksTests.build/sources"
+    },
+    "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/michio/Desktop/TrinTasks-Repo/TrinTasksApp/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

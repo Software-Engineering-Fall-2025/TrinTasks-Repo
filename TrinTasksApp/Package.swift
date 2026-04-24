@@ -17,7 +17,8 @@ let package = Package(
         .executableTarget(
             name: "TrinTasksApp",
             dependencies: ["TrinTasks"],
-            path: "Sources/TrinTasksApp"
+            path: "Sources/TrinTasksApp",
+            resources: [.process("Resources")]
         ),
         // Tests depend on library, not executable
         .testTarget(

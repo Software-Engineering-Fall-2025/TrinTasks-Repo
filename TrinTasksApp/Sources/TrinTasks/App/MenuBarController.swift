@@ -16,7 +16,14 @@ final class MenuBarController {
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "checklist", accessibilityDescription: "TrinTasks")
+            if let iconURL = Bundle.main.url(forResource: "icon", withExtension: "png"),
+               let img = NSImage(contentsOf: iconURL) {
+                img.size = NSSize(width: 18, height: 18)
+                img.isTemplate = true
+                button.image = img
+            } else {
+                button.image = NSImage(systemSymbolName: "checklist", accessibilityDescription: "TrinTasks")
+            }
             button.action = #selector(togglePanel)
             button.target = self
         }

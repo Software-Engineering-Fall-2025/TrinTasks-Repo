@@ -1,18 +1,32 @@
-// TrinTasks - Entry Point
-// This file bootstraps the application by importing and initializing the UI controller
-
 import { UIController } from './src/ui-controller.js';
+import { setupTauriListeners } from './tauri-listeners.js';
+import { getAssignmentReminders } from './src/storage-manager.js';
+import { invoke } from '@tauri-apps/api/core';
 
-// Initialize the UI when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded, initializing UIController...');
+document.addEventListener('DOMContentLoaded', async () => {
   try {
-    new UIController();
-    console.log('UIController initialized successfully');
+    const controller = new UIController();
     requestAnimationFrame(() => {
       document.body.classList.add('popup-ready');
     });
+
+    // Re-register stored reminders with the Rust scheduler on every launch
+    const reminders = await getAssignmentReminders();
+    const now = Date.now();
+    for (const [eventId, reminder] of Object.entries(reminders)) {
+      if (reminder.reminderTime > now) {
+        await invoke('schedule_reminder', {
+          id: `assignment_reminder_${eventId}`,
+          fireAt: reminder.reminderTime,
+          title: `Reminder: ${reminder.title}`,
+          body: reminder.dueRaw ? `Due: ${reminder.dueRaw}` : 'Assignment due soon'
+        });
+      }
+    }
+
+    // Listen for 30-minute background refresh events emitted by Rust
+    await setupTauriListeners(() => controller.updateEventsFromStorage());
   } catch (error) {
-    console.error('Failed to initialize UIController:', error);
+    console.error('Failed to initialize TrinTasks:', error);
   }
 });

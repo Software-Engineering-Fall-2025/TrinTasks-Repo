@@ -24,7 +24,8 @@ import {
   saveWeather,
   setAssignmentReminder,
   clearAssignmentReminder,
-  getAssignmentReminderStatus
+  getAssignmentReminderStatus,
+  getStore
 } from './storage-manager.js';
 
 export class UIController {
@@ -701,10 +702,10 @@ export class UIController {
     this.events.push(customEvent);
 
     // Save to storage
-    await chrome.storage.local.set({
-      events: this.events,
-      subjectTags: this.subjectTags
-    });
+    const store = await getStore();
+    await store.set('events', this.events);
+    await store.set('subjectTags', this.subjectTags);
+    await store.save();
 
     // Update display
     this.weekViewController.renderWeekView();
@@ -875,7 +876,9 @@ export class UIController {
 
   async handleUnpin(eventId) {
     delete this.pinnedAssignments[eventId];
-    await chrome.storage.local.set({ pinnedAssignments: this.pinnedAssignments });
+    const store = await getStore();
+    await store.set('pinnedAssignments', this.pinnedAssignments);
+    await store.save();
     this.sidebar.updateData({ pinnedAssignments: this.pinnedAssignments });
     this.sidebar.update();
     this.showEventsForSelectedDay();
@@ -999,13 +1002,18 @@ export class UIController {
 
   async updateEventsFromStorage() {
     try {
-      const data = await chrome.storage.local.get(['events', 'completedAssignments', 'inProgressAssignments', 'icalUrl', 'pinnedAssignments']);
-      if (data.icalUrl) {
-        this.icalLinkInput.value = data.icalUrl;
-        this.settingsIcalLink.value = data.icalUrl;
+      const store = await getStore();
+      const icalUrl = await store.get('icalUrl');
+      const events = await store.get('events');
+      const completedAssignments = await store.get('completedAssignments');
+      const inProgressAssignments = await store.get('inProgressAssignments');
+      const pinnedAssignments = await store.get('pinnedAssignments');
+      if (icalUrl) {
+        this.icalLinkInput.value = icalUrl;
+        this.settingsIcalLink.value = icalUrl;
       }
-      this.pinnedAssignments = data.pinnedAssignments || {};
-      const merged = mergeCompletionStatus(data.events || [], data.completedAssignments, data.inProgressAssignments);
+      this.pinnedAssignments = pinnedAssignments || {};
+      const merged = mergeCompletionStatus(events || [], completedAssignments, inProgressAssignments);
       if (merged.length > 0) {
         this.displayEvents(merged);
       }
@@ -1020,33 +1028,14 @@ export class UIController {
       this.showError('Please add an iCal link first');
       return;
     }
-    await chrome.storage.local.set({ icalUrl: currentUrl });
-
-    const response = await new Promise(resolve => {
-      try {
-        chrome.runtime.sendMessage({ action: 'refreshCalendarNow', icalUrl: currentUrl }, (resp) => {
-          if (chrome.runtime.lastError) {
-            resolve({ success: false, error: chrome.runtime.lastError.message });
-          } else {
-            resolve(resp);
-          }
-        });
-      } catch (err) {
-        resolve({ success: false, error: err?.message || 'Unable to contact background' });
-      }
-    });
-
-    if (!response || !response.success) {
-      console.warn('Background refresh failed or no response', response && response.error);
-      try {
-        await refreshLocally(currentUrl);
-        await this.updateEventsFromStorage();
-      } catch (err) {
-        this.showError(response && response.error ? response.error : 'Could not refresh calendar. Please try again.');
-        return;
-      }
-    } else {
+    const store = await getStore();
+    await store.set('icalUrl', currentUrl);
+    await store.save();
+    try {
+      await refreshLocally(currentUrl);
       await this.updateEventsFromStorage();
+    } catch (err) {
+      this.showError('Could not refresh calendar. Please try again.');
     }
   }
 
@@ -1265,8 +1254,8 @@ export class UIController {
 
   // Subject tag methods
   async loadSubjectTags() {
-    const data = await chrome.storage.local.get(['subjectTags']);
-    this.subjectTags = data.subjectTags || {};
+    const store = await getStore();
+    this.subjectTags = await store.get('subjectTags') || {};
     // Migrate old format (string color) to new format (object with color and displayName)
     this.migrateSubjectTagsFormat();
     this.displaySubjectTags();
@@ -1639,8 +1628,8 @@ export class UIController {
     if (!this.tutorialOverlay) return;
 
     // Check if tutorial was already completed
-    const data = await chrome.storage.local.get(['tutorialCompleted']);
-    if (data.tutorialCompleted) return;
+    const store = await getStore();
+    if (await store.get('tutorialCompleted')) return;
 
     // Initialize tutorial
     this.tutorialCurrentStep = 1;
@@ -1653,7 +1642,7 @@ export class UIController {
     if (!this.tutorialOverlay) return;
     this.tutorialOverlay.classList.add('hidden');
     // Mark tutorial as completed
-    chrome.storage.local.set({ tutorialCompleted: true });
+    getStore().then(store => { store.set('tutorialCompleted', true); store.save(); });
   }
 
   createTutorialDots() {

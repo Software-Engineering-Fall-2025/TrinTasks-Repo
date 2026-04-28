@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Default capability for TrinTasks","local":true,"windows":["main"],"permissions":["core:default","store:default","notification:default","http:default"]}}

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TrinTasks</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 id="headerTitle"><span id="logoTrin">Trin</span><span id="logoEgg"></span><span id="logoTasks">Tasks</span></h1>
+      <div class="header-buttons">
+        <div id="weatherSelector" class="weather-selector hidden" title="Change weather">
+          <span id="weatherIcon">☀️</span>
+          <div id="weatherOptions" class="weather-options">
+            <button data-weather="clear" title="Sunny">☀️</button>
+            <button data-weather="rain" title="Rainy">🌧️</button>
+            <button data-weather="snow" title="Snowy">❄️</button>
+            <button data-weather="storm" title="Stormy">⛈️</button>
+            <button data-weather="leaves" title="Autumn Leaves">🍂</button>
+          </div>
+        </div>
+        <button id="weekViewBtn" class="header-btn week-view-btn" title="Show all week's assignments">Week</button>
+        <button id="settingsBtn" class="settings-btn" title="Settings">Settings</button>
+      </div>
+    </div>
+    <div id="refreshToast" class="refresh-toast hidden"></div>
+
+    <!-- Main View -->
+    <div id="mainView">
+      <!-- Setup/Welcome Screen -->
+      <div id="setupView" class="setup-view">
+        <div class="setup-content">
+          <div class="setup-welcome">
+            <h2>Welcome to TrinTasks</h2>
+            <p>Track your assignments with ease</p>
+          </div>
+
+          <div class="setup-section">
+            <div class="setup-section-header">
+              <span class="setup-step">1</span>
+              <label for="icalLink">Paste your calendar link</label>
+            </div>
+            <input
+              type="text"
+              id="icalLink"
+              placeholder="webcal://... or https://..."
+              required
+            >
+          </div>
+
+          <div class="setup-section">
+            <div class="setup-section-header">
+              <span class="setup-step">2</span>
+              <label id="setupStyleLabel">Choose your style</label>
+            </div>
+            <div class="setup-style-picker" id="setupStylePicker">
+              <!-- Style selection (shown first) -->
+              <div class="ui-style-options" id="setupUIStyles">
+                <button type="button" class="ui-style-btn" data-style="neobrutalism">Neo-Brutalism</button>
+                <button type="button" class="ui-style-btn" data-style="glass">Glass</button>
+              </div>
+              <!-- Color selection (replaces style options) -->
+              <div class="setup-themes hidden" id="setupThemes">
+                <button type="button" class="setup-theme-btn" data-theme="fern">
+                  <span class="setup-theme-swatch" style="background: #2f855a;"></span>
+                  <span class="setup-theme-name">Fern</span>
+                </button>
+                <button type="button" class="setup-theme-btn" data-theme="ocean">
+                  <span class="setup-theme-swatch" style="background: #0ea5e9;"></span>
+                  <span class="setup-theme-name">Ocean</span>
+                </button>
+                <button type="button" class="setup-theme-btn" data-theme="sunset">
+                  <span class="setup-theme-swatch" style="background: #f97316;"></span>
+                  <span class="setup-theme-name">Sunset</span>
+                </button>
+                <button type="button" class="setup-theme-btn selected" data-theme="slate">
+                  <span class="setup-theme-swatch" style="background: #64748b;"></span>
+                  <span class="setup-theme-name">Slate</span>
+                </button>
+                <button type="button" class="setup-theme-btn" data-theme="orchid">
+                  <span class="setup-theme-swatch" style="background: #a855f7;"></span>
+                  <span class="setup-theme-name">Orchid</span>
+                </button>
+                <button type="button" class="setup-theme-btn" data-theme="midnight">
+                  <span class="setup-theme-swatch" style="background: #1c2541;"></span>
+                  <span class="setup-theme-name">Midnight</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button id="parseBtn" class="setup-submit-btn">Get Started</button>
+        </div>
+      </div>
+
+      <div id="loadingSpinner" class="spinner hidden"></div>
+
+      <div id="errorMessage" class="error hidden"></div>
+
+      <div id="mainContent" class="main-content hidden">
+        <div class="left-column">
+          <!-- Week View -->
+          <div id="weekView" class="week-view">
+            <div id="weatherParticles" class="weather-particles"></div>
+            <div id="weatherOverlay" class="weather-overlay"></div>
+            <div class="week-header">
+              <button id="prevWeek" class="nav-btn">‹</button>
+              <h2 id="weekTitle">This Week</h2>
+              <button id="nextWeek" class="nav-btn">›</button>
+              <button id="todayBtn" class="nav-btn today-btn hidden" title="Jump to today">Today</button>
+            </div>
+            <div id="weekDays" class="week-days"></div>
+          </div>
+
+          <!-- Events for Selected Day -->
+          <div id="eventsList" class="events-list">
+            <div class="events-list-header">
+              <h2 id="selectedDayTitle">Today's Assignments</h2>
+              <div class="events-header-actions">
+                <button id="addCustomBtn" class="add-custom-btn" title="Add custom assignment">+ Add</button>
+                <div class="filter-select" id="filterSelect" title="Filter assignments">
+                  <div class="filter-current" id="filterCurrent">Uncompleted</div>
+                  <div class="filter-options" id="filterOptions">
+                    <button data-mode="all">All</button>
+                    <button data-mode="active">Uncompleted</button>
+                    <button data-mode="completed">Completed</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="eventsContainer" class="events-container"></div>
+          </div>
+
+          <!-- Week Assignments View (all week's assignments) -->
+          <div id="weekAssignmentsView" class="week-assignments-view hidden">
+            <div class="week-assignments-header">
+              <h2 id="weekAssignmentsTitle">This Week's Assignments</h2>
+            </div>
+            <div id="weekAssignmentsContainer" class="week-assignments-container"></div>
+          </div>
+        </div>
+
+        <!-- Right-side Major Assignments Bar -->
+        <aside id="majorAssignmentsBar" class="major-assignments-bar hidden" aria-live="polite">
+          <div class="major-bar-header">
+            <h3>Major assignments</h3>
+            <div class="major-bar-note">Tests, quizzes, essays, projects</div>
+          </div>
+          <div id="majorList" class="major-list">
+            <!-- Items populated dynamically -->
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Settings View -->
+    <div id="settingsView" class="settings-view hidden">
+      <div class="settings-content">
+        <!-- Calendar Source Section -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Calendar Source</h3>
+          <div class="settings-group">
+            <label for="settingsIcalLink">iCal Link</label>
+            <input
+              type="text"
+              id="settingsIcalLink"
+              placeholder="webcal://... or https://example.com/calendar.ics"
+            >
+          </div>
+          <div class="settings-group settings-buttons-row">
+            <button id="refreshCalendarBtn" class="btn-primary" type="button">Refresh Calendar</button>
+            <button id="clearDataBtn" class="btn-danger">Clear All Data</button>
+          </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Notifications</h3>
+          <div class="settings-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="enableReminders">
+              <span>Enable assignment reminders</span>
+            </label>
+            <div class="reminder-options">
+              <label for="reminderHours">Reminder lead time:</label>
+              <select id="reminderHours">
+                <option value="1">1 hour</option>
+                <option value="2">2 hours</option>
+                <option value="4">4 hours</option>
+                <option value="6">6 hours</option>
+                <option value="12">12 hours</option>
+                <option value="24" selected>24 hours</option>
+                <option value="48">48 hours</option>
+              </select>
+            </div>
+            <div class="settings-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="showMajorAssignments">
+                <span>Show "Major assignments" side bar</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- UI Style Section -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">UI Style</h3>
+          <p class="settings-hint">Choose the visual style of the interface</p>
+          <div class="settings-group">
+            <div class="ui-style-options" id="settingsUIStyles">
+              <button type="button" class="ui-style-btn selected" data-style="neobrutalism">Neo-Brutalism</button>
+              <button type="button" class="ui-style-btn" data-style="glass">Glass</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Section -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Color Theme</h3>
+          <p class="settings-hint">Pick a color vibe for the header, buttons, and cards</p>
+          <div class="settings-group theme-options" id="themeOptions">
+            <button type="button" class="theme-pill" data-theme-option="fern">
+              <span class="swatch swatch-fern"></span>Fern
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="ocean">
+              <span class="swatch swatch-ocean"></span>Ocean
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="sunset">
+              <span class="swatch swatch-sunset"></span>Sunset
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="slate">
+              <span class="swatch swatch-slate"></span>Slate
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="orchid">
+              <span class="swatch swatch-orchid"></span>Orchid
+            </button>
+            <button type="button" class="theme-pill" data-theme-option="midnight">
+              <span class="swatch swatch-midnight"></span>Midnight
+            </button>
+          </div>
+        </div>
+
+        <!-- Subject Tags Section -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Subject Colors</h3>
+          <p class="settings-hint">Click a color to change it</p>
+          <div class="settings-group">
+            <div id="subjectTags" class="subject-tags-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Assignment Modal -->
+    <div id="customAssignmentModal" class="custom-assignment-modal hidden">
+      <div class="custom-assignment-overlay"></div>
+      <div class="custom-assignment-form">
+        <h3>Add Custom Assignment</h3>
+        <div class="form-group">
+          <label for="customTitle">Assignment Title</label>
+          <input type="text" id="customTitle" placeholder="Enter assignment title" />
+        </div>
+        <div class="form-group">
+          <label for="customDueDate">Due Date</label>
+          <input type="date" id="customDueDate" />
+        </div>
+        <div class="form-group">
+          <label for="customDueTime">Due Time (optional)</label>
+          <input type="time" id="customDueTime" />
+        </div>
+        <div class="form-group">
+          <label for="customCourse">Course</label>
+          <div class="course-selection">
+            <select id="customCourse">
+              <option value="">Select a course...</option>
+            </select>
+            <button id="addNewCourseBtn" class="add-course-btn" title="Add new course">+</button>
+          </div>
+          <input type="text" id="customNewCourse" class="custom-course-input hidden" placeholder="Enter new course name" />
+        </div>
+        <div class="form-group">
+          <label for="customDescription">Description (optional)</label>
+          <textarea id="customDescription" placeholder="Add any notes..."></textarea>
+        </div>
+        <div class="form-buttons">
+          <button id="customCancelBtn" class="btn-secondary">Cancel</button>
+          <button id="customSaveBtn" class="btn-primary">Add Assignment</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Easter Egg Modal -->
+    <div id="easterEggModal" class="easter-egg-modal hidden">
+      <div class="easter-egg-confetti" id="easterEggConfetti"></div>
+      <div class="easter-egg-content">
+        <div class="easter-egg-icon">&#127881;</div>
+        <h2>You found an Easter Egg!</h2>
+        <p>You've unlocked <strong>Weather Effects</strong>! Use the weather button in the header to add <span class="animated-text">animated</span> particles like rain, snow, and falling leaves to any theme.</p>
+        <button id="easterEggClose" class="easter-egg-btn">Awesome!</button>
+      </div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay hidden">
+      <div class="tutorial-backdrop"></div>
+      <div class="tutorial-modal">
+        <div class="tutorial-progress">
+          <div class="tutorial-progress-bar" id="tutorialProgressBar"></div>
+        </div>
+        <div class="tutorial-content" id="tutorialContent">
+          <!-- Step 1: Welcome -->
+          <div class="tutorial-step" data-step="1">
+            <div class="tutorial-icon tutorial-icon-logo"><span class="tut-logo-trin">Trin</span><span class="tut-logo-tasks">Tasks</span></div>
+            <h2>Welcome to TrinTasks!</h2>
+            <p>Your calendar has been loaded successfully. Let's take a quick tour of all the features to help you stay organized.</p>
+          </div>
+          <!-- Step 2: Week Calendar -->
+          <div class="tutorial-step hidden" data-step="2">
+            <div class="tutorial-icon tutorial-icon-calendar"><div class="tut-cal-grid"><span></span><span></span><span></span><span></span><span class="tut-cal-today"></span><span></span><span></span></div></div>
+            <h2>Week Calendar</h2>
+            <p>Click any day in the calendar to see assignments due that day. Today is highlighted, and the selected day has a border.</p>
+          </div>
+          <!-- Step 3: Week/Day View Toggle -->
+          <div class="tutorial-step hidden" data-step="3">
+            <div class="tutorial-icon tutorial-icon-btn">Week</div>
+            <h2>Week View</h2>
+            <p>Click the <strong>Week</strong> button in the header to see all assignments for the entire week grouped by day.</p>
+          </div>
+          <!-- Step 4: Assignment Actions -->
+          <div class="tutorial-step hidden" data-step="4">
+            <div class="tutorial-icon tutorial-icon-dots">&#8942;</div>
+            <h2>Assignment Actions</h2>
+            <p>Click the <strong>three dots</strong> on any assignment to access actions: mark complete, mark in-progress, or set a reminder.</p>
+          </div>
+          <!-- Step 5: Reminders -->
+          <div class="tutorial-step hidden" data-step="5">
+            <div class="tutorial-icon tutorial-icon-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+            <h2>Reminders</h2>
+            <p>Set reminders for individual assignments to get notified 1, 2, 4, or 24 hours before they're due.</p>
+          </div>
+          <!-- Step 6: Drag to Reorder -->
+          <div class="tutorial-step hidden" data-step="6">
+            <div class="tutorial-icon tutorial-icon-drag"><span></span><span></span><span></span></div>
+            <h2>Drag to Reorder</h2>
+            <p>Drag and drop assignments to reorder them by priority. Your custom order is saved automatically.</p>
+          </div>
+          <!-- Step 7: Major Assignments Sidebar -->
+          <div class="tutorial-step hidden" data-step="7">
+            <div class="tutorial-icon tutorial-icon-sidebar"><div class="tut-sidebar-main"></div><div class="tut-sidebar-bar"><span></span><span></span></div></div>
+            <h2>Major Assignments</h2>
+            <p>Enable the <strong>Major Assignments sidebar</strong> in Settings to see upcoming tests, quizzes, essays, and projects at a glance on the right side of the screen.</p>
+          </div>
+          <!-- Step 8: Settings -->
+          <div class="tutorial-step hidden" data-step="8">
+            <div class="tutorial-icon tutorial-icon-btn">Settings</div>
+            <h2>Settings</h2>
+            <p>Click <strong>Settings</strong> to change themes, customize colors for each class, enable the major assignments sidebar, and configure reminders.</p>
+          </div>
+          <!-- Step 9: Done -->
+          <div class="tutorial-step hidden" data-step="9">
+            <div class="tutorial-icon tutorial-icon-check">&#10003;</div>
+            <h2>You're All Set!</h2>
+            <p>That's everything you need to know. Stay organized and good luck with your assignments!</p>
+          </div>
+        </div>
+        <div class="tutorial-footer">
+          <button id="tutorialSkip" class="tutorial-btn tutorial-btn-skip">Skip Tutorial</button>
+          <div class="tutorial-nav">
+            <button id="tutorialPrev" class="tutorial-btn tutorial-btn-nav hidden">Back</button>
+            <button id="tutorialNext" class="tutorial-btn tutorial-btn-primary">Next</button>
+          </div>
+        </div>
+        <div class="tutorial-dots" id="tutorialDots"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

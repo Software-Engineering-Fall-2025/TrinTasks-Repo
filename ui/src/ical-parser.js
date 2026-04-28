@@ -1,4 +1,5 @@
 // iCal Parser - Handles parsing of iCal/ICS calendar files
+import { fetch } from '@tauri-apps/plugin-http';
 
 export class ICalParser {
   /**

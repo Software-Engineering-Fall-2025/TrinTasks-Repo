@@ -11,6 +11,7 @@ html {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background: transparent;
 }
 
 /* CSS Variables - Default is Neo-Brutalism with Slate theme */
@@ -45,7 +46,7 @@ html {
 
 body {
   font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   margin: 0;
   padding: 0;
@@ -60,10 +61,10 @@ body {
   width: 800px;
   height: 600px;
   padding: 0;
-  background: var(--surface);
+  background: var(--bg);
   border: none;
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.14);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -482,6 +483,31 @@ h2 {
 .setup-submit-btn:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0px var(--black);
+}
+
+.setup-trinlabs {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 12px;
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+}
+
+.quit-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.quit-btn:hover {
+  opacity: 1;
+  background: rgba(255,0,0,0.12);
 }
 
 /* Midnight theme setup view */
@@ -1672,6 +1698,58 @@ body.menu-open .event:not(.menu-active) {
   margin: 0;
 }
 
+/* Settings Privacy / Opt-out */
+.settings-privacy {
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--border-color, #ddd);
+  margin-top: 8px;
+}
+
+.settings-privacy-label {
+  font-size: 12px;
+}
+
+.settings-privacy-hint {
+  margin: 4px 0 0 24px;
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+  opacity: 0.8;
+}
+
+/* Settings Copyright */
+.settings-copyright {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+  padding: 16px 0 8px;
+  opacity: 0.7;
+}
+
+.settings-version {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: var(--surface, #eee);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Confirm Dialog */
+.confirm-dialog-form {
+  max-width: 360px;
+}
+
+.confirm-dialog-message {
+  margin: 8px 0 20px;
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
 /* Settings Checkbox */
 .checkbox-label {
   display: flex !important;
@@ -1938,6 +2016,46 @@ body.menu-open .event:not(.menu-active) {
 
 .refresh-toast:hover {
   opacity: 0.9;
+}
+
+/* Update Banner */
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-bottom: 2px solid rgba(0,0,0,0.15);
+}
+
+.update-banner.hidden {
+  display: none;
+}
+
+.update-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.update-banner-btn {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 2px solid #fff;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.update-banner-btn--primary {
+  background: #fff;
+  color: var(--accent, #3b82f6);
 }
 
 /* Theme-specific toast colors */

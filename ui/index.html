@@ -25,6 +25,13 @@
       </div>
     </div>
     <div id="refreshToast" class="refresh-toast hidden"></div>
+    <div id="updateBanner" class="update-banner hidden">
+      <span>Update available: <strong id="updateBannerVersion"></strong></span>
+      <div class="update-banner-actions">
+        <button id="updateBannerInstall" class="update-banner-btn update-banner-btn--primary">Install &amp; Restart</button>
+        <button id="updateBannerLater" class="update-banner-btn">Later</button>
+      </div>
+    </div>
 
     <!-- Main View -->
     <div id="mainView">
@@ -91,6 +98,7 @@
           </div>
 
           <button id="parseBtn" class="setup-submit-btn">Get Started</button>
+          <p class="setup-trinlabs">with love from TrinLabs ❤️</p>
         </div>
       </div>
 
@@ -250,6 +258,41 @@
             <div id="subjectTags" class="subject-tags-container"></div>
           </div>
         </div>
+
+        <!-- Quit Section -->
+        <div class="settings-section">
+          <div class="settings-group settings-buttons-row">
+            <button id="quitBtn" class="btn-danger">Quit</button>
+          </div>
+        </div>
+
+        <!-- Privacy -->
+        <div class="settings-privacy">
+          <label class="checkbox-label settings-privacy-label">
+            <input type="checkbox" id="telemetryOptOut">
+            <span>Opt out of anonymous usage analytics</span>
+          </label>
+          <p class="settings-privacy-hint">Helps us understand how TrinTasks is used. No personal data is collected.</p>
+        </div>
+
+        <!-- Copyright -->
+        <div class="settings-copyright">
+          <span class="settings-version">v0.1.0-beta.1</span>
+          &copy; 2025 TrinLabs. All rights reserved.
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div id="confirmDialog" class="custom-assignment-modal hidden">
+      <div class="custom-assignment-overlay"></div>
+      <div class="custom-assignment-form confirm-dialog-form">
+        <h3 id="confirmDialogTitle">Are you sure?</h3>
+        <p id="confirmDialogMessage" class="confirm-dialog-message"></p>
+        <div class="form-buttons">
+          <button id="confirmDialogCancel" class="btn-secondary">Cancel</button>
+          <button id="confirmDialogOk" class="btn-danger">Confirm</button>
+        </div>
       </div>
     </div>
 
@@ -377,6 +420,9 @@
     </div>
   </div>
 
+  <!-- Keyboard focus trap — keeps WebView as first responder on macOS transparent windows -->
+  <input id="keyboardTrap" tabindex="-1" aria-hidden="true"
+    style="position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:-1px;left:-1px;">
   <script type="module" src="popup.js"></script>
 </body>
 </html>

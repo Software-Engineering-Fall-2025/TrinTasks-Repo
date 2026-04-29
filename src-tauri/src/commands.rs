@@ -1,5 +1,10 @@
 use crate::scheduler::{Reminder, SchedulerState};
-use tauri::State;
+use tauri::{AppHandle, State};
+
+#[tauri::command]
+pub fn quit_app(app: AppHandle) {
+    app.exit(0);
+}
 
 #[tauri::command]
 pub fn schedule_reminder(

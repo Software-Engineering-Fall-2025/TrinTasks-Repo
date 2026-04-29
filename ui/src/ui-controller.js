@@ -1,5 +1,7 @@
 // UI Controller - Main orchestrator that ties all modules together
 
+import { captureEvent, loadTelemetryPreference, setTelemetryOptOut, isTelemetryOptedOut } from './telemetry.js';
+import { invoke } from '@tauri-apps/api/core';
 import { ICalParser } from './ical-parser.js';
 import { ThemeManager } from './theme-manager.js';
 import { EventRenderer } from './event-renderer.js';
@@ -70,6 +72,7 @@ export class UIController {
     this.headerTitle = document.getElementById('headerTitle');
     this.settingsBtn = document.getElementById('settingsBtn');
     this.weekViewBtn = document.getElementById('weekViewBtn');
+    this.quitBtn = document.getElementById('quitBtn');
 
     // Week assignments view elements
     this.weekAssignmentsView = document.getElementById('weekAssignmentsView');
@@ -84,10 +87,18 @@ export class UIController {
     this.settingsIcalLink = document.getElementById('settingsIcalLink');
     this.refreshCalendarBtn = document.getElementById('refreshCalendarBtn');
     this.clearDataBtn = document.getElementById('clearDataBtn');
+
+    // Confirm dialog elements
+    this.confirmDialog = document.getElementById('confirmDialog');
+    this.confirmDialogTitle = document.getElementById('confirmDialogTitle');
+    this.confirmDialogMessage = document.getElementById('confirmDialogMessage');
+    this.confirmDialogOk = document.getElementById('confirmDialogOk');
+    this.confirmDialogCancel = document.getElementById('confirmDialogCancel');
     this.autoRefreshCheckbox = document.getElementById('autoRefresh');
     this.enableRemindersCheckbox = document.getElementById('enableReminders');
     this.reminderHoursSelect = document.getElementById('reminderHours');
     this.themeOptions = document.getElementById('themeOptions');
+    this.telemetryOptOutCheckbox = document.getElementById('telemetryOptOut');
 
     // Subject tags elements
     this.subjectTagsDiv = document.getElementById('subjectTags');
@@ -214,8 +225,10 @@ export class UIController {
       this.weekViewBtn.addEventListener('click', () => {
         if (this.isWeekAssignmentsView) {
           this.showDayView();
+          captureEvent('view_switched', { view: 'day' });
         } else {
           this.showWeekAssignmentsView();
+          captureEvent('view_switched', { view: 'week' });
         }
       });
     }
@@ -246,6 +259,9 @@ export class UIController {
 
     // Settings event listeners
     this.settingsBtn.addEventListener('click', () => this.openSettings());
+    if (this.quitBtn) {
+      this.quitBtn.addEventListener('click', () => invoke('quit_app'));
+    }
     // Note: Header title click for closing settings is handled in setupEasterEgg()
     if (this.refreshCalendarBtn) {
       this.refreshCalendarBtn.addEventListener('click', () => this.handleManualRefresh());
@@ -259,12 +275,19 @@ export class UIController {
     this.enableRemindersCheckbox.addEventListener('change', () => this.handleSaveSettings());
     this.reminderHoursSelect.addEventListener('change', () => this.handleSaveSettings());
 
+    if (this.telemetryOptOutCheckbox) {
+      this.telemetryOptOutCheckbox.addEventListener('change', () => {
+        setTelemetryOptOut(this.telemetryOptOutCheckbox.checked);
+      });
+    }
+
     if (this.showMajorAssignmentsCheckbox) {
       this.showMajorAssignmentsCheckbox.addEventListener('change', () => {
-        this.sidebar.toggleVisibility(this.showMajorAssignmentsCheckbox.checked);
+        const enabled = this.showMajorAssignmentsCheckbox.checked;
+        this.sidebar.toggleVisibility(enabled);
         this.handleSaveSettings();
-        // Re-render events to show/hide pin buttons
         this.showEventsForSelectedDay();
+        captureEvent('sidebar_toggled', { enabled });
       });
     }
 
@@ -288,6 +311,7 @@ export class UIController {
             this.updateThemePillSelection();
             this.updateWeatherSelectorVisibility();
             this.handleSaveSettings();
+            captureEvent('theme_changed', { theme });
           }
         });
       });
@@ -338,6 +362,7 @@ export class UIController {
             btn.classList.add('selected');
             this.themeManager.applyUIStyle(style);
             this.handleSaveSettings();
+            captureEvent('ui_style_changed', { style });
           }
         });
       });
@@ -640,6 +665,29 @@ export class UIController {
       this.customNewCourseInput.value = '';
       this.customCourseSelect.focus();
     }
+  }
+
+  showConfirm(message, title = 'Are you sure?') {
+    return new Promise((resolve) => {
+      if (!this.confirmDialog) { resolve(false); return; }
+      this.confirmDialogTitle.textContent = title;
+      this.confirmDialogMessage.textContent = message;
+      this.confirmDialog.classList.remove('hidden');
+
+      const cleanup = () => {
+        this.confirmDialog.classList.add('hidden');
+        this.confirmDialogOk.removeEventListener('click', onOk);
+        this.confirmDialogCancel.removeEventListener('click', onCancel);
+        this.confirmDialog.removeEventListener('click', onOverlay);
+      };
+      const onOk = () => { cleanup(); resolve(true); };
+      const onCancel = () => { cleanup(); resolve(false); };
+      const onOverlay = (e) => { if (e.target === this.confirmDialog) onCancel(); };
+
+      this.confirmDialogOk.addEventListener('click', onOk);
+      this.confirmDialogCancel.addEventListener('click', onCancel);
+      this.confirmDialog.addEventListener('click', onOverlay);
+    });
   }
 
   closeCustomAssignmentModal() {
@@ -1092,9 +1140,11 @@ export class UIController {
 
     this.settingsView.classList.add('hidden');
     this.mainView.classList.remove('hidden');
-    // Restore header with easter egg structure (no 'ity' visible after unlocking)
     this.headerTitle.innerHTML = `<span id="logoTrin">Trin</span><span id="logoEgg"></span><span id="logoTasks">Tasks</span>`;
     this.logoEgg = document.getElementById('logoEgg');
+    if (this.weatherUnlocked) {
+      this.logoEgg.textContent = 'ity';
+    }
     this.headerTitle.style.cursor = 'default';
     this.settingsBtn.style.display = 'block';
     if (this.weekViewBtn) {
@@ -1138,6 +1188,11 @@ export class UIController {
 
     // Update weather selector visibility
     this.updateWeatherSelectorVisibility();
+
+    // Sync opt-out checkbox with stored preference
+    if (this.telemetryOptOutCheckbox) {
+      this.telemetryOptOutCheckbox.checked = isTelemetryOptedOut();
+    }
   }
 
   async handleSaveSettings() {
@@ -1167,7 +1222,7 @@ export class UIController {
   }
 
   async handleClearAllData() {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+    if (await this.showConfirm('Are you sure you want to clear all data? This cannot be undone.', 'Clear All Data')) {
       await clearAllData();
       this.events = [];
       this.subjectTags = {};
@@ -1187,6 +1242,13 @@ export class UIController {
       }
       this.sidebar.toggleVisibility(false);
       this.loadSubjectTags();
+
+      // Reset weather lock (easter egg must be re-discovered)
+      this.weatherUnlocked = false;
+      this.themeManager.disableWeather();
+      document.body.classList.remove('weather-unlocked');
+      this.updateWeatherSelectorVisibility();
+
       this.themeManager.applyTheme('slate');
       this.themeManager.applyUIStyle('neobrutalism');
       this.updateThemePillSelection();
@@ -1413,6 +1475,8 @@ export class UIController {
         if (this.logoEgg) {
           this.logoEgg.classList.add('caret-active');
         }
+        // Ensure WebView has keyboard focus (needed on macOS transparent windows)
+        document.getElementById('keyboardTrap')?.focus();
         e.stopPropagation();
       });
     }
@@ -1502,6 +1566,7 @@ export class UIController {
     // Mark as unlocked
     this.weatherUnlocked = true;
     await unlockWeather();
+    captureEvent('easter_egg_found');
 
     // Add body class to disable easter egg hover
     document.body.classList.add('weather-unlocked');
